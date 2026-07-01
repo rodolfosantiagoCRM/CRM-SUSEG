@@ -6,6 +6,8 @@ drop table if exists public.tipos_servico_materiais cascade;
 drop table if exists public.materiais_predefinidos cascade;
 drop table if exists public.tipos_servico cascade;
 drop table if exists public.gdrive_config cascade;
+drop table if exists public.faturas cascade;
+drop table if exists public.planos_saas cascade;
 drop table if exists public.saas_billing cascade;
 drop table if exists public.empresas_config cascade;
 drop table if exists public.empresas cascade;
@@ -328,6 +330,7 @@ begin
 end;
 $$ language plpgsql security definer;
 
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
