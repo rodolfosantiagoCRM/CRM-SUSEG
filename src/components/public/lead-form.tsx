@@ -8,6 +8,7 @@ export default function LeadForm({ defaultService = '' }: { defaultService?: str
     nome: '',
     email: '',
     telefone: '',
+    cidade: '',
     tipo_servico: '',
   });
 
@@ -36,7 +37,7 @@ export default function LeadForm({ defaultService = '' }: { defaultService?: str
         nome: formData.nome,
         email: formData.email || null,
         telefone: formData.telefone,
-        cidade: 'Curitiba', // Default city to satisfy database NOT NULL constraint
+        cidade: formData.cidade, // Captured location from user
         area_m2: null,
         endereco_obra: null,
         numero: null,
@@ -44,7 +45,7 @@ export default function LeadForm({ defaultService = '' }: { defaultService?: str
       });
 
       setSuccess(true);
-      setFormData({ nome: '', email: '', telefone: '', tipo_servico: '' });
+      setFormData({ nome: '', email: '', telefone: '', cidade: '', tipo_servico: '' });
     } catch (err: any) {
       console.error('Falha ao enviar lead:', err);
       setError(err.message || 'Ocorreu um erro ao enviar seus dados. Tente novamente.');
@@ -126,27 +127,44 @@ export default function LeadForm({ defaultService = '' }: { defaultService?: str
         </div>
       </div>
 
-      <div className="space-y-1.5">
-        <label htmlFor="tipo_servico" className="text-[10px] font-bold uppercase tracking-widest text-slate-450">
-          Serviço de Interesse
-        </label>
-        <div className="relative">
-          <select
-            id="tipo_servico"
-            name="tipo_servico"
-            value={formData.tipo_servico}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <label htmlFor="cidade" className="text-[10px] font-bold uppercase tracking-widest text-slate-450">
+            Localização (Cidade/UF)
+          </label>
+          <input
+            type="text"
+            id="cidade"
+            name="cidade"
+            value={formData.cidade}
             onChange={handleChange}
             required
-            className="w-full bg-white border border-slate-200 focus:border-suseg-green focus:ring-2 focus:ring-suseg-green/10 rounded-xl px-4 py-3 text-slate-805 outline-none transition-all text-sm appearance-none cursor-pointer font-semibold"
-          >
-            <option value="" disabled>Selecione o serviço</option>
-            <option value="Carregamento Veicular">Carregamento Veicular (Infraestrutura EV)</option>
-            <option value="Automação Residencial e Predial">Automação Residencial e Predial</option>
-            <option value="Segurança Eletrônica">Segurança Eletrônica (CFTV, Alarme, Acesso)</option>
-          </select>
-          <svg className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
-          </svg>
+            placeholder="Ex: Florianópolis / SC"
+            className="w-full bg-white border border-slate-200 focus:border-suseg-green focus:ring-2 focus:ring-suseg-green/10 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 outline-none transition-all text-sm font-semibold"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <label htmlFor="tipo_servico" className="text-[10px] font-bold uppercase tracking-widest text-slate-450">
+            Serviço de Interesse
+          </label>
+          <div className="relative">
+            <select
+              id="tipo_servico"
+              name="tipo_servico"
+              value={formData.tipo_servico}
+              onChange={handleChange}
+              required
+              className="w-full bg-white border border-slate-200 focus:border-suseg-green focus:ring-2 focus:ring-suseg-green/10 rounded-xl px-4 py-3 text-slate-805 outline-none transition-all text-sm appearance-none cursor-pointer font-semibold"
+            >
+              <option value="" disabled>Selecione o serviço</option>
+              <option value="Carregamento Veicular">Carregamento Veicular (Infraestrutura EV)</option>
+              <option value="Automação Residencial e Predial">Automação Residencial e Predial</option>
+              <option value="Segurança Eletrônica">Segurança Eletrônica (CFTV, Alarme, Acesso)</option>
+            </select>
+            <svg className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
         </div>
       </div>
 
