@@ -208,6 +208,8 @@ DROP POLICY IF EXISTS "Administradores podem gerenciar todos os perfis" ON publi
 DROP POLICY IF EXISTS "Usuários podem ver seu próprio perfil" ON public.perfis_usuarios;
 DROP POLICY IF EXISTS "Perfis usuarios select policy" ON public.perfis_usuarios;
 DROP POLICY IF EXISTS "Perfis usuarios insert/delete policy" ON public.perfis_usuarios;
+DROP POLICY IF EXISTS "Perfis usuarios insert policy" ON public.perfis_usuarios;
+DROP POLICY IF EXISTS "Perfis usuarios delete policy" ON public.perfis_usuarios;
 DROP POLICY IF EXISTS "Perfis usuarios update policy" ON public.perfis_usuarios;
 
 
