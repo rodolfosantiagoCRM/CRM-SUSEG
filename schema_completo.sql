@@ -836,9 +836,9 @@ CREATE POLICY "Materiais predefinidos multi-tenant policy" ON public.materiais_p
 -- 1. Remover a restrição de role antiga da tabela perfis_usuarios
 ALTER TABLE public.perfis_usuarios DROP CONSTRAINT IF EXISTS perfis_usuarios_role_check;
 
--- 2. Adicionar a nova restrição permitindo mestre e vendedor
+-- 2. Adicionar a nova restrição permitindo mestre, vendedor e super_admin
 ALTER TABLE public.perfis_usuarios ADD CONSTRAINT perfis_usuarios_role_check 
-  CHECK (role IN ('admin', 'instalador', 'tecnico', 'mestre', 'vendedor'));
+  CHECK (role IN ('admin', 'instalador', 'tecnico', 'mestre', 'vendedor', 'super_admin'));
 
 
 -- ========================================== 
