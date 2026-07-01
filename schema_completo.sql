@@ -976,18 +976,21 @@ VALUES ('documentos_crm', 'documentos_crm', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- 4. Definir políticas de RLS no storage.objects para o bucket 'documentos_crm'
+DROP POLICY IF EXISTS "Permitir leitura de documentos por autenticados" ON storage.objects;
 -- Permitir leitura de arquivos por usuários autenticados
 CREATE POLICY "Permitir leitura de documentos por autenticados"
 ON storage.objects FOR SELECT
 TO authenticated
 USING (bucket_id = 'documentos_crm');
 
+DROP POLICY IF EXISTS "Permitir upload de documentos por autenticados" ON storage.objects;
 -- Permitir inserção (upload) de arquivos por usuários autenticados
 CREATE POLICY "Permitir upload de documentos por autenticados"
 ON storage.objects FOR INSERT
 TO authenticated
 WITH CHECK (bucket_id = 'documentos_crm');
 
+DROP POLICY IF EXISTS "Permitir exclusão de documentos por autenticados" ON storage.objects;
 -- Permitir exclusão de arquivos por usuários autenticados (opcional, para limpeza futura)
 CREATE POLICY "Permitir exclusão de documentos por autenticados"
 ON storage.objects FOR DELETE
