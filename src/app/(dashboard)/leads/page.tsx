@@ -336,7 +336,7 @@ export default function LeadsDashboard() {
                   <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Nome</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Contato</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Localização</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Área (m²)</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Serviço</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Status</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Ação</th>
                 </tr>
@@ -379,8 +379,14 @@ export default function LeadsDashboard() {
                             <div className="text-[10px] text-gray-400 mt-0.5">{lead.email || 'N/A'}</div>
                           </td>
                           <td className="px-6 py-4 text-sm text-gray-600">{lead.cidade}</td>
-                          <td className="px-6 py-4 font-mono font-bold text-gray-700">
-                            {lead.area_m2 ? `${lead.area_m2} m²` : '-'}
+                          <td className="px-6 py-4">
+                            {lead.tipo_servico ? (
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                {lead.tipo_servico}
+                              </span>
+                            ) : (
+                              <span className="text-gray-400 italic font-medium">-</span>
+                            )}
                           </td>
                           <td className="px-6 py-4 text-center">
                             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border ${cfg.bg} ${cfg.text} ${cfg.border}`}>
