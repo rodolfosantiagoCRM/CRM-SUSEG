@@ -25,6 +25,7 @@ export default function ConfiguracoesPage() {
   const [mensagemTemplate, setMensagemTemplate] = useState('');
   const [headersCustomizados, setHeadersCustomizados] = useState('');
   const [payloadCustomizado, setPayloadCustomizado] = useState('');
+  const [whatsappContato, setWhatsappContato] = useState('');
 
   // Estado para teste
   const [testeTelefone, setTesteTelefone] = useState('');
@@ -53,6 +54,7 @@ export default function ConfiguracoesPage() {
         setMensagemTemplate(data.mensagem_template);
         setHeadersCustomizados(data.headers_customizados || '');
         setPayloadCustomizado(data.payload_customizado || '');
+        setWhatsappContato(data.whatsapp_contato || '');
       } catch (err: any) {
         showToast('Erro ao carregar configurações do banco.', 'error');
       } finally {
@@ -99,6 +101,7 @@ export default function ConfiguracoesPage() {
         mensagem_template: mensagemTemplate,
         headers_customizados: headersCustomizados.trim() || null,
         payload_customizado: payloadCustomizado.trim() || null,
+        whatsapp_contato: whatsappContato.trim(),
       });
 
       if (res.success) {
@@ -247,6 +250,35 @@ export default function ConfiguracoesPage() {
               />
               <div className="w-12 h-6.5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
             </label>
+          </div>
+
+          {/* Card WhatsApp de Contato Público no Site */}
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm space-y-4">
+            <div className="space-y-1">
+              <h2 className="text-base font-bold text-gray-950 flex items-center gap-2">
+                <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                WhatsApp de Contato do Site
+              </h2>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Defina o número de telefone que os clientes irão acionar ao clicar nos botões do WhatsApp e chamadas de orçamento no site principal da SUSEG.
+              </p>
+            </div>
+            
+            <div className="space-y-1.5">
+              <label className={labelClass}>Número do WhatsApp de Contato (com DDI e DDD)</label>
+              <input
+                type="text"
+                value={whatsappContato}
+                onChange={(e) => setWhatsappContato(e.target.value)}
+                placeholder="Ex: 5541999999999"
+                className={inputClass}
+              />
+              <p className="text-[10px] text-gray-400 font-bold">
+                * Use apenas números, começando com 55 (ex: 5541999999999). Evite espaços, hifens ou parênteses.
+              </p>
+            </div>
           </div>
 
           {/* Card Configurações da API */}

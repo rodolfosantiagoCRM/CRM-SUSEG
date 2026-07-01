@@ -209,6 +209,7 @@ export async function getWhatsappConfig(): Promise<WhatsappConfig> {
         mensagem_template: 'Olá {nome_tecnico}, sua próxima visita técnica para o cliente {cliente_nome} no endereço {endereco_obra} será daqui a {antecedencia} (agendada para às {horario_visita}).',
         headers_customizados: null,
         payload_customizado: null,
+        whatsapp_contato: '5541999999999',
         empresa_id: perfil.empresa_id,
         updated_at: new Date().toISOString(),
       } as unknown as WhatsappConfig;
@@ -229,6 +230,7 @@ export async function getWhatsappConfig(): Promise<WhatsappConfig> {
       mensagem_template: 'Olá {nome_tecnico}, sua próxima visita técnica para o cliente {cliente_nome} no endereço {endereco_obra} será daqui a {antecedencia} (agendada para às {horario_visita}).',
       headers_customizados: null,
       payload_customizado: null,
+      whatsapp_contato: '5541999999999',
       updated_at: new Date().toISOString(),
     } as unknown as WhatsappConfig;
   }
@@ -521,6 +523,26 @@ export async function triggerManualCheck(): Promise<{ success: boolean; sentCoun
   } catch (err: any) {
     console.error('Erro no triggerManualCheck:', err);
     return { success: false, error: err.message || 'Erro inesperado no envio manual.' };
+  }
+}
+
+/**
+ * Obtém o número público do WhatsApp cadastrado para contato dos clientes
+ */
+export async function getPublicWhatsappNumber(): Promise<string> {
+  try {
+    const supabase = createServerClient();
+    const { data, error } = await supabase
+      .from('whatsapp_config')
+      .select('whatsapp_contato')
+      .eq('empresa_id', '00000000-0000-0000-0000-000000000000')
+      .maybeSingle();
+
+    if (error) throw error;
+    return data?.whatsapp_contato || '5541999999999';
+  } catch (err: any) {
+    console.warn('Erro ao obter número público do WhatsApp:', err.message);
+    return '5541999999999';
   }
 }
 

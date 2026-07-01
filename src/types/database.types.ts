@@ -77,6 +77,7 @@ export interface WhatsappConfig {
   mensagem_template: string;
   headers_customizados: string | null;
   payload_customizado: string | null;
+  whatsapp_contato?: string;
   updated_at: string;
 }
 

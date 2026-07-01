@@ -6,6 +6,7 @@ import LeadForm from '@/components/public/lead-form';
 import EvCalculator from '@/components/public/ev-calculator';
 import WhatsAppButton from '@/components/public/whatsapp-button';
 import CasanLogo from '@/components/public/casan-logo';
+import { getPublicWhatsappNumber } from '@/app/actions/whatsapp';
 
 interface Installation {
   id: number;
@@ -19,6 +20,19 @@ interface Installation {
 export default function LandingPage() {
   const [selectedService, setSelectedService] = useState('');
   const [activeImage, setActiveImage] = useState<Installation | null>(null);
+  const [whatsappNumber, setWhatsappNumber] = useState('5541999999999');
+
+  React.useEffect(() => {
+    async function loadWhatsapp() {
+      try {
+        const num = await getPublicWhatsappNumber();
+        setWhatsappNumber(num);
+      } catch (e) {
+        console.warn('Erro ao carregar whatsApp público:', e);
+      }
+    }
+    loadWhatsapp();
+  }, []);
 
   // Lista de Serviços
   const services = [
@@ -468,7 +482,7 @@ export default function LandingPage() {
           </div>
           <div className="pt-2">
             <a
-              href="https://wa.me/5541999999999?text=Olá!%20Gostaria%20de%20solicitar%20um%20orçamento%20para%20soluções%20da%20SUSEG."
+              href={`https://wa.me/${whatsappNumber}?text=Olá!%20Gostaria%20de%20solicitar%20um%20orçamento%20para%20soluções%20da%20SUSEG.`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-8 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-md shadow-emerald-500/10 cursor-pointer hover:scale-103 active:scale-97"
@@ -581,7 +595,7 @@ export default function LandingPage() {
       )}
 
       {/* Botão Flutuante do WhatsApp */}
-      <WhatsAppButton />
+      <WhatsAppButton whatsappNumber={whatsappNumber} />
     </div>
   );
 }
