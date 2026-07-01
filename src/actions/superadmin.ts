@@ -2,6 +2,8 @@
 
 import { createServerClient } from '@/lib/supabase';
 import { cookies } from 'next/headers';
+import { WhatsappConfig } from '@/types/database.types';
+import { sendWhatsAppHttp, runCronNotificationCheck } from '@/app/actions/whatsapp';
 
 // Helper de segurança para validar se o requisitante é super_admin ativo
 async function checkSuperAdminPermission(supabaseAdmin: ReturnType<typeof createServerClient>) {
@@ -36,6 +38,15 @@ async function checkSuperAdminPermission(supabaseAdmin: ReturnType<typeof create
   }
 
   return user;
+}
+
+// Limpa o número de telefone para formato brasileiro (DDI + DDD + Número apenas)
+function cleanPhoneNumber(phone: string): string {
+  const digits = phone.replace(/\D/g, '');
+  if ((digits.length === 10 || digits.length === 11) && !digits.startsWith('55')) {
+    return '55' + digits;
+  }
+  return digits;
 }
 
 interface CriarEmpresaEClienteParams {
@@ -656,6 +667,171 @@ export async function excluirEmpresa(empresaId: string) {
   } catch (err: any) {
     console.error('[Deep Cleanse] Erro inesperado no excluirEmpresa:', err);
     return { success: false, error: err.message || 'Erro inesperado ao excluir empresa.' };
+  }
+}
+
+/**
+ * Obtém a configuração de WhatsApp de uma empresa específica (Super Admin)
+ */
+export async function getWhatsappConfigForSuperAdmin(
+  empresaId: string
+): Promise<{ success: boolean; data?: WhatsappConfig; error?: string }> {
+  try {
+    const supabase = createServerClient();
+    await checkSuperAdminPermission(supabase);
+
+    const { data, error } = await supabase
+      .from('whatsapp_config')
+      .select('*')
+      .eq('empresa_id', empresaId)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    if (!data) {
+      // Retorna configuração padrão vinculada à empresa
+      return {
+        success: true,
+        data: {
+          id: 0,
+          ativo: false,
+          api_provider: 'evolution',
+          api_url: '',
+          api_key: '',
+          instancia: '',
+          antecedencia_minutos: 60,
+          mensagem_template: 'Olá {nome_tecnico}, sua próxima visita técnica para o cliente {cliente_nome} no endereço {endereco_obra} será daqui a {antecedencia} (agendada para às {horario_visita}).',
+          headers_customizados: null,
+          payload_customizado: null,
+          whatsapp_contato: '',
+          empresa_id: empresaId,
+          updated_at: new Date().toISOString(),
+        } as unknown as WhatsappConfig
+      };
+    }
+
+    return { success: true, data: data as WhatsappConfig };
+  } catch (err: any) {
+    console.error('Erro ao obter whatsapp_config para superadmin:', err);
+    return { success: false, error: err.message || 'Erro ao carregar configurações de WhatsApp.' };
+  }
+}
+
+/**
+ * Salva a configuração de WhatsApp de uma empresa específica (Super Admin)
+ */
+export async function saveWhatsappConfigForSuperAdmin(
+  empresaId: string,
+  updates: Partial<Omit<WhatsappConfig, 'id' | 'updated_at'>>
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = createServerClient();
+    await checkSuperAdminPermission(supabase);
+
+    const { data: existing } = await supabase
+      .from('whatsapp_config')
+      .select('id')
+      .eq('empresa_id', empresaId)
+      .maybeSingle();
+
+    if (existing) {
+      const { error } = await supabase
+        .from('whatsapp_config')
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', existing.id);
+      if (error) throw error;
+    } else {
+      const { data: allConfigs } = await supabase
+        .from('whatsapp_config')
+        .select('id')
+        .order('id', { ascending: false });
+      const nextId = allConfigs && allConfigs.length > 0 ? Math.max(...allConfigs.map((c: any) => c.id)) + 1 : 1;
+
+      const { error } = await supabase
+        .from('whatsapp_config')
+        .insert({
+          id: nextId,
+          ...updates,
+          empresa_id: empresaId,
+          updated_at: new Date().toISOString(),
+        });
+      if (error) throw error;
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    console.error('Erro ao salvar whatsapp_config para superadmin:', err);
+    return { success: false, error: err.message || 'Erro ao salvar configurações de WhatsApp.' };
+  }
+}
+
+/**
+ * Envia uma mensagem de teste utilizando a configuração de WhatsApp de uma empresa específica (Super Admin)
+ */
+export async function testWhatsappSendForSuperAdmin(
+  empresaId: string,
+  phone: string,
+  message: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = createServerClient();
+    await checkSuperAdminPermission(supabase);
+
+    const { data: config, error } = await supabase
+      .from('whatsapp_config')
+      .select('*')
+      .eq('empresa_id', empresaId)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!config || !config.api_url) {
+      return { success: false, error: 'A URL da API de WhatsApp não está configurada para esta empresa.' };
+    }
+
+    const cleanPhone = cleanPhoneNumber(phone);
+    if (!cleanPhone || cleanPhone.length < 10) {
+      return { success: false, error: 'Número de telefone inválido. Informe o DDD e o número.' };
+    }
+
+    const result = await sendWhatsAppHttp({
+      api_provider: config.api_provider,
+      api_url: config.api_url,
+      api_key: config.api_key,
+      instancia: config.instancia,
+      headers_customizados: config.headers_customizados,
+      payload_customizado: config.payload_customizado,
+      phone: cleanPhone,
+      message,
+    });
+
+    return result;
+  } catch (err: any) {
+    console.error('Erro no envio de teste superadmin:', err);
+    return { success: false, error: err.message || 'Erro inesperado ao disparar teste.' };
+  }
+}
+
+/**
+ * Dispara manualmente a verificação de notificações de visitas da empresa selecionada (Super Admin)
+ */
+export async function triggerManualCheckForSuperAdmin(
+  empresaId: string
+): Promise<{ success: boolean; sentCount?: number; skippedCount?: number; error?: string }> {
+  try {
+    const supabase = createServerClient();
+    await checkSuperAdminPermission(supabase);
+
+    const res = await runCronNotificationCheck(empresaId);
+    if (!res.success) {
+      return { success: false, error: res.error };
+    }
+    return { success: true, sentCount: res.sentCount, skippedCount: res.skippedCount };
+  } catch (err: any) {
+    console.error('Erro no triggerManualCheck superadmin:', err);
+    return { success: false, error: err.message || 'Erro inesperado na verificação manual.' };
   }
 }
 

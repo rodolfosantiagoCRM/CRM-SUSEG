@@ -9,9 +9,14 @@ import {
   atualizarEmpresa,
   alternarBloqueioEmpresa,
   salvarFaturamentoCustomizado,
-  excluirEmpresa
+  excluirEmpresa,
+  getWhatsappConfigForSuperAdmin,
+  saveWhatsappConfigForSuperAdmin,
+  testWhatsappSendForSuperAdmin,
+  triggerManualCheckForSuperAdmin
 } from '@/actions/superadmin';
 import { supabase } from '@/lib/supabase';
+import { WhatsappConfig } from '@/types/database.types';
 
 interface EmpresaMetric {
   id: string;
@@ -53,6 +58,29 @@ export default function SuperAdminDashboard() {
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isWhatsappModalOpen, setIsWhatsappModalOpen] = useState(false);
+
+  // Estados de WhatsApp (Super Admin)
+  const [loadingWhatsappConfig, setLoadingWhatsappConfig] = useState(false);
+  const [savingWhatsappConfig, setSavingWhatsappConfig] = useState(false);
+  const [testingWhatsappSend, setTestingWhatsappSend] = useState(false);
+  const [triggeringCheck, setTriggeringCheck] = useState(false);
+
+  // Estados dos Campos do WhatsApp
+  const [waAtivo, setWaAtivo] = useState(false);
+  const [waApiProvider, setWaApiProvider] = useState<'evolution' | 'zapi' | 'custom'>('evolution');
+  const [waApiUrl, setWaApiUrl] = useState('');
+  const [waApiKey, setWaApiKey] = useState('');
+  const [waInstancia, setWaInstancia] = useState('');
+  const [waAntecedenciaMinutos, setWaAntecedenciaMinutos] = useState(60);
+  const [waMensagemTemplate, setWaMensagemTemplate] = useState('');
+  const [waHeadersCustomizados, setWaHeadersCustomizados] = useState('');
+  const [waPayloadCustomizado, setWaPayloadCustomizado] = useState('');
+  const [waWhatsappContato, setWaWhatsappContato] = useState('');
+
+  // Estados de Teste de Disparo e Trigger Manual
+  const [waTesteTelefone, setWaTesteTelefone] = useState('');
+  const [waTesteMensagem, setWaTesteMensagem] = useState('Olá! Esta é uma mensagem de teste enviada pelo Super Admin através do CRM.');
 
   // Estados de Senha (olho)
   const [showCreatePassword, setShowCreatePassword] = useState(false);
@@ -240,6 +268,141 @@ export default function SuperAdminDashboard() {
       setError(err.message || 'Erro inesperado.');
     } finally {
       setEditLoading(false);
+    }
+  };
+
+  // --- Ações de WhatsApp para Super Admin ---
+  const handleOpenWhatsappModal = async (empresa: EmpresaMetric) => {
+    setError(null);
+    setSuccessMsg(null);
+    setSelectedEmpresa(empresa);
+    setLoadingWhatsappConfig(true);
+    setIsWhatsappModalOpen(true);
+    
+    try {
+      const res = await getWhatsappConfigForSuperAdmin(empresa.id);
+      if (res.success && res.data) {
+        const config = res.data;
+        setWaAtivo(config.ativo);
+        setWaApiProvider(config.api_provider || 'evolution');
+        setWaApiUrl(config.api_url || '');
+        setWaApiKey(config.api_key || '');
+        setWaInstancia(config.instancia || '');
+        setWaAntecedenciaMinutos(config.antecedencia_minutos ?? 60);
+        setWaMensagemTemplate(config.mensagem_template || '');
+        setWaHeadersCustomizados(config.headers_customizados || '');
+        setWaPayloadCustomizado(config.payload_customizado || '');
+        setWaWhatsappContato(config.whatsapp_contato || '');
+      } else {
+        setError(res.error || 'Erro ao carregar configurações de WhatsApp.');
+        setIsWhatsappModalOpen(false);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Erro inesperado de conexão ao buscar WhatsApp.');
+      setIsWhatsappModalOpen(false);
+    } finally {
+      setLoadingWhatsappConfig(false);
+    }
+  };
+
+  const handleSaveWhatsappConfig = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedEmpresa) return;
+    setSavingWhatsappConfig(true);
+    setError(null);
+    setSuccessMsg(null);
+
+    // Validar JSON se for customizado
+    if (waApiProvider === 'custom') {
+      if (waHeadersCustomizados.trim()) {
+        try {
+          JSON.parse(waHeadersCustomizados);
+        } catch (err) {
+          setError('Os cabeçalhos customizados devem ser um JSON válido.');
+          setSavingWhatsappConfig(false);
+          return;
+        }
+      }
+      if (waPayloadCustomizado.trim()) {
+        try {
+          JSON.parse(waPayloadCustomizado);
+        } catch (err) {
+          setError('O payload customizado deve ser um JSON válido.');
+          setSavingWhatsappConfig(false);
+          return;
+        }
+      }
+    }
+
+    try {
+      const res = await saveWhatsappConfigForSuperAdmin(selectedEmpresa.id, {
+        ativo: waAtivo,
+        api_provider: waApiProvider,
+        api_url: waApiUrl.trim() || null,
+        api_key: waApiKey.trim() || null,
+        instancia: waInstancia.trim() || null,
+        antecedencia_minutos: Number(waAntecedenciaMinutos),
+        mensagem_template: waMensagemTemplate.trim(),
+        headers_customizados: waHeadersCustomizados.trim() || null,
+        payload_customizado: waPayloadCustomizado.trim() || null,
+        whatsapp_contato: waWhatsappContato.trim(),
+      });
+
+      if (res.success) {
+        setSuccessMsg(`Configurações de WhatsApp da empresa "${selectedEmpresa.nome_fantasia}" salvas com sucesso!`);
+        setIsWhatsappModalOpen(false);
+        loadData();
+      } else {
+        setError(res.error || 'Erro ao salvar configurações.');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Erro de conexão ao salvar.');
+    } finally {
+      setSavingWhatsappConfig(false);
+    }
+  };
+
+  const handleTestWhatsappSend = async () => {
+    if (!selectedEmpresa) return;
+    if (!waTesteTelefone.trim()) {
+      setError('Informe um número de telefone para o teste.');
+      return;
+    }
+    setTestingWhatsappSend(true);
+    setError(null);
+    setSuccessMsg(null);
+
+    try {
+      const res = await testWhatsappSendForSuperAdmin(selectedEmpresa.id, waTesteTelefone.trim(), waTesteMensagem);
+      if (res.success) {
+        setSuccessMsg('Mensagem de teste disparada com sucesso!');
+      } else {
+        setError(res.error || 'Erro no envio da mensagem de teste.');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Erro de conexão no disparo de teste.');
+    } finally {
+      setTestingWhatsappSend(false);
+    }
+  };
+
+  const handleTriggerWhatsappCheck = async () => {
+    if (!selectedEmpresa) return;
+    setTriggeringCheck(true);
+    setError(null);
+    setSuccessMsg(null);
+
+    try {
+      const res = await triggerManualCheckForSuperAdmin(selectedEmpresa.id);
+      if (res.success) {
+        setSuccessMsg(`Varredura concluída! ${res.sentCount} mensagens enviadas, ${res.skippedCount} visitas antigas ignoradas.`);
+      } else {
+        setError(res.error || 'Erro ao processar notificações.');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Erro de conexão na varredura manual.');
+    } finally {
+      setTriggeringCheck(false);
     }
   };
 
@@ -735,6 +898,13 @@ export default function SuperAdminDashboard() {
                           className="bg-slate-900 border border-slate-800 hover:border-violet-500/40 text-slate-300 hover:text-violet-400 py-1.5 px-3 rounded-lg text-[11px] font-semibold transition-all cursor-pointer"
                         >
                           Faturamento
+                        </button>
+
+                        <button
+                          onClick={() => handleOpenWhatsappModal(emp)}
+                          className="bg-slate-900 border border-slate-800 hover:border-cyan-500/40 hover:text-cyan-400 py-1.5 px-3 rounded-lg text-[11px] font-semibold transition-all cursor-pointer"
+                        >
+                          WhatsApp
                         </button>
                         
                         <button
@@ -1350,6 +1520,345 @@ export default function SuperAdminDashboard() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          MODAL: INTEGRAÇÃO WHATSAPP (SUPER ADMIN)
+          ========================================================================= */}
+      {isWhatsappModalOpen && selectedEmpresa && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+          <div className="bg-slate-900 border border-slate-850 w-full max-w-3xl rounded-2xl shadow-2xl relative my-8 overflow-hidden animate-slide-up">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-600/5 rounded-bl-full pointer-events-none" />
+            
+            <div className="p-6 border-b border-slate-850 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+                  <span className="w-2.5 h-6 rounded-full bg-gradient-to-b from-cyan-500 to-teal-500 inline-block shrink-0" />
+                  Configuração de WhatsApp: {selectedEmpresa.nome_fantasia}
+                </h3>
+                <p className="text-slate-400 text-xs mt-0.5">Gerencie as credenciais da API e as notificações para esta empresa.</p>
+              </div>
+              <button
+                onClick={() => setIsWhatsappModalOpen(false)}
+                className="text-slate-400 hover:text-slate-100 p-1 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {loadingWhatsappConfig ? (
+              <div className="p-12 flex flex-col items-center justify-center gap-3">
+                <svg className="animate-spin h-8 w-8 text-cyan-500" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                <span className="text-xs text-slate-400">Carregando configurações...</span>
+              </div>
+            ) : (
+              <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+                {error && (
+                  <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl flex items-start gap-2.5 text-xs font-semibold animate-fade-in">
+                    <svg className="w-4 h-4 shrink-0 mt-0.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div>{error}</div>
+                  </div>
+                )}
+                {successMsg && (
+                  <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-3 rounded-xl flex items-start gap-2.5 text-xs font-semibold animate-fade-in">
+                    <svg className="w-4 h-4 shrink-0 mt-0.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <div>{successMsg}</div>
+                  </div>
+                )}
+
+                <form onSubmit={handleSaveWhatsappConfig} className="space-y-6">
+                  
+                  {/* Status do Envio */}
+                  <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <h4 className="text-xs font-bold text-slate-200">Notificações Automáticas</h4>
+                      <p className="text-[10px] text-slate-500 leading-relaxed">
+                        Habilite ou desabilite as notificações automáticas de visitas técnicas para os técnicos desta empresa.
+                      </p>
+                    </div>
+                    
+                    <label className="relative inline-flex items-center cursor-pointer select-none">
+                      <input 
+                        type="checkbox" 
+                        checked={waAtivo} 
+                        onChange={(e) => setWaAtivo(e.target.checked)}
+                        className="sr-only peer" 
+                      />
+                      <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-slate-900 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-300 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                    </label>
+                  </div>
+
+                  {/* WhatsApp de Contato Público no Site */}
+                  <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <div className="space-y-0.5">
+                      <h4 className="text-xs font-bold text-slate-200">WhatsApp de Contato do Site</h4>
+                      <p className="text-[10px] text-slate-500 leading-relaxed">
+                        Defina o número de telefone que os clientes irão acionar ao clicar no botão do WhatsApp na Landing Page deste inquilino.
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Número do WhatsApp (com DDI e DDD)</label>
+                      <input
+                        type="text"
+                        value={waWhatsappContato}
+                        onChange={(e) => setWaWhatsappContato(e.target.value)}
+                        placeholder="Ex: 5541999999999"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl py-2 px-3.5 text-xs outline-none text-slate-200 placeholder:text-slate-650"
+                      />
+                      <p className="text-[9px] text-slate-500">
+                        * Apenas números, começando com 55 (ex: 5541999999999).
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Credenciais da API */}
+                  <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-4 space-y-4">
+                    <h4 className="text-xs font-bold text-slate-200 border-b border-slate-850 pb-2">Credenciais da API de WhatsApp</h4>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Provedor */}
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Provedor</label>
+                        <select
+                          value={waApiProvider}
+                          onChange={(e) => setWaApiProvider(e.target.value as any)}
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl py-2 px-3 text-xs outline-none text-slate-200 cursor-pointer"
+                        >
+                          <option value="evolution">Evolution API</option>
+                          <option value="zapi">Z-API</option>
+                          <option value="custom">POST HTTP Genérico</option>
+                        </select>
+                      </div>
+
+                      {/* Antecedência */}
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Antecedência de Notificação</label>
+                        <select
+                          value={waAntecedenciaMinutos}
+                          onChange={(e) => setWaAntecedenciaMinutos(Number(e.target.value))}
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl py-2 px-3 text-xs outline-none text-slate-200 cursor-pointer"
+                        >
+                          <option value="30">30 Minutos antes da visita</option>
+                          <option value="60">1 Hora antes da visita</option>
+                          <option value="120">2 Horas antes da visita</option>
+                          <option value="180">3 Horas antes da visita</option>
+                          <option value="360">6 Horas antes da visita</option>
+                          <option value="720">12 Horas antes da visita</option>
+                          <option value="1440">24 Horas antes da visita</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* URL */}
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        {waApiProvider === 'custom' ? 'URL do Endpoint HTTP POST' : 'URL Base da API'}
+                      </label>
+                      <input
+                        type="url"
+                        value={waApiUrl}
+                        onChange={(e) => setWaApiUrl(e.target.value)}
+                        placeholder={
+                          waApiProvider === 'evolution'
+                            ? 'https://sua-evolution-api.com'
+                            : waApiProvider === 'zapi'
+                            ? 'https://api.z-api.io'
+                            : 'https://seu-gateway.com/v1/messages'
+                        }
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl py-2 px-3.5 text-xs outline-none text-slate-200 placeholder:text-slate-650"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Chave/ApiKey */}
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                          {waApiProvider === 'evolution' ? 'ApiKey' : waApiProvider === 'zapi' ? 'Token' : 'Token (Opcional)'}
+                        </label>
+                        <input
+                          type="password"
+                          value={waApiKey}
+                          onChange={(e) => setWaApiKey(e.target.value)}
+                          placeholder="Chave de segurança ou ApiKey"
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl py-2 px-3.5 text-xs outline-none text-slate-200 placeholder:text-slate-650"
+                        />
+                      </div>
+
+                      {/* Instância */}
+                      {waApiProvider !== 'custom' && (
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">ID / Nome da Instância</label>
+                          <input
+                            type="text"
+                            value={waInstancia}
+                            onChange={(e) => setWaInstancia(e.target.value)}
+                            placeholder="Ex: InstanciaCRM"
+                            className="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl py-2 px-3.5 text-xs outline-none text-slate-200 placeholder:text-slate-650"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Customizados */}
+                    {waApiProvider === 'custom' && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Headers Personalizados (JSON)</label>
+                          <textarea
+                            rows={3}
+                            value={waHeadersCustomizados}
+                            onChange={(e) => setWaHeadersCustomizados(e.target.value)}
+                            placeholder='{"Authorization": "Bearer TOKEN"}'
+                            className="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl py-2 px-3.5 text-xs outline-none text-slate-200 placeholder:text-slate-650 font-mono"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Payload JSON (Template)</label>
+                          <textarea
+                            rows={3}
+                            value={waPayloadCustomizado}
+                            onChange={(e) => setWaPayloadCustomizado(e.target.value)}
+                            placeholder='{"to": "{phone}", "text": "{message}"}'
+                            className="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl py-2 px-3.5 text-xs outline-none text-slate-200 placeholder:text-slate-650 font-mono"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Template da Mensagem */}
+                  <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <h4 className="text-xs font-bold text-slate-200 border-b border-slate-850 pb-2">Corpo da Mensagem</h4>
+                    
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Texto da Mensagem</label>
+                      <textarea
+                        rows={4}
+                        value={waMensagemTemplate}
+                        onChange={(e) => setWaMensagemTemplate(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl py-2 px-3.5 text-xs outline-none text-slate-200 placeholder:text-slate-650 leading-relaxed"
+                        required
+                      />
+                    </div>
+
+                    <div className="bg-violet-950/20 border border-violet-500/10 rounded-lg p-3 text-[10px] text-violet-400 leading-normal space-y-1">
+                      <span className="font-bold block uppercase tracking-wider text-violet-300">Variáveis Dinâmicas:</span>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 font-mono text-[9px]">
+                        <div>{`{nome_tecnico}`}</div>
+                        <div>{`{cliente_nome}`}</div>
+                        <div>{`{data_visita}`}</div>
+                        <div>{`{horario_visita}`}</div>
+                        <div>{`{endereco_obra}`}</div>
+                        <div>{`{observacoes}`}</div>
+                        <div>{`{antecedencia}`}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsWhatsappModalOpen(false)}
+                      className="bg-transparent hover:bg-slate-850 text-slate-400 hover:text-slate-100 py-2.5 px-4 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={savingWhatsappConfig}
+                      className="bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white py-2.5 px-5 rounded-xl text-xs font-semibold shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                      {savingWhatsappConfig ? 'Salvando...' : 'Salvar Configurações'}
+                    </button>
+                  </div>
+                </form>
+
+                {/* Bloco de Teste de Disparo e Trigger Manual */}
+                <div className="border-t border-slate-850 pt-6 space-y-4">
+                  <h4 className="text-xs font-bold text-slate-200">Ferramentas de Depuração / Teste</h4>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end bg-slate-950/40 p-4 rounded-xl border border-slate-800">
+                    {/* Telefone de Teste */}
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Celular de Teste</label>
+                      <input
+                        type="text"
+                        value={waTesteTelefone}
+                        onChange={(e) => setWaTesteTelefone(e.target.value)}
+                        placeholder="Ex: 41999991111"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl py-2 px-3 text-xs outline-none text-slate-200 placeholder:text-slate-650"
+                      />
+                    </div>
+                    {/* Mensagem de Teste */}
+                    <div className="space-y-1 md:col-span-2 flex gap-2 items-end">
+                      <div className="flex-1 space-y-1">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Mensagem</label>
+                        <input
+                          type="text"
+                          value={waTesteMensagem}
+                          onChange={(e) => setWaTesteMensagem(e.target.value)}
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl py-2 px-3 text-xs outline-none text-slate-200"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleTestWhatsappSend}
+                        disabled={testingWhatsappSend || !waAtivo}
+                        className="bg-slate-900 border border-slate-800 hover:border-cyan-500/40 text-slate-300 hover:text-cyan-400 py-2 px-4 rounded-xl text-xs font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer h-9 shrink-0 flex items-center justify-center"
+                      >
+                        {testingWhatsappSend ? 'Disparando...' : 'Enviar Teste'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Trigger Manual */}
+                  <div className="bg-slate-950/40 p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="space-y-0.5">
+                      <h5 className="text-xs font-semibold text-slate-300">Varredura e Disparo Manual das Visitas</h5>
+                      <p className="text-[9px] text-slate-500 leading-normal">
+                        Dispara o processo de busca de visitas agendadas próximas à antecedência configurada para realizar as notificações pendentes agora.
+                      </p>
+                    </div>
+                    
+                    <button
+                      type="button"
+                      onClick={handleTriggerWhatsappCheck}
+                      disabled={triggeringCheck || !waAtivo}
+                      className="bg-cyan-500/10 border border-cyan-500/20 hover:bg-cyan-500/20 text-cyan-400 py-2.5 px-4 rounded-xl text-xs font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shrink-0 flex items-center gap-1.5"
+                    >
+                      {triggeringCheck ? (
+                        <>
+                          <svg className="animate-spin h-3.5 w-3.5 text-cyan-400" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                          Processando...
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17" />
+                          </svg>
+                          Disparar Varredura
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            )}
           </div>
         </div>
       )}

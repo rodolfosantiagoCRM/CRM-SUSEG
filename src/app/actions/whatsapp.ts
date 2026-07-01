@@ -48,7 +48,7 @@ function cleanPhoneNumber(phone: string): string {
   return digits;
 }
 
-interface SendParams {
+export interface SendParams {
   api_provider: 'evolution' | 'zapi' | 'custom';
   api_url: string;
   api_key: string | null;
@@ -60,7 +60,7 @@ interface SendParams {
 }
 
 // Helper interno para disparar a requisição HTTP
-async function sendWhatsAppHttp(params: SendParams): Promise<{ success: boolean; error?: string }> {
+export async function sendWhatsAppHttp(params: SendParams): Promise<{ success: boolean; error?: string }> {
   const { api_provider, api_url, api_key, instancia, headers_customizados, payload_customizado, phone, message } = params;
   
   let targetUrl = api_url.trim();
