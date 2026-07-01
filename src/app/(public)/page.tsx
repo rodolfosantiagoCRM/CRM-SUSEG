@@ -170,41 +170,61 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section (Atenção) */}
-      <section className="relative pt-32 pb-20 md:pt-48 md:pb-36 flex flex-col items-center justify-center px-6 bg-gradient-to-b from-suseg-green-light/40 via-white to-white">
+      <section className="relative pt-24 pb-20 md:pt-40 md:pb-28 px-6 bg-gradient-to-b from-suseg-green-light/30 via-white to-white overflow-hidden">
         {/* Glowing visual effect in background */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,122,62,0.04)_0%,transparent_60%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,122,62,0.03)_0%,transparent_60%)] pointer-events-none" />
         
-        <div className="max-w-5xl text-center space-y-8 z-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-suseg-green/20 bg-suseg-green-light text-suseg-green text-xs font-black uppercase tracking-wider">
-            <span className="w-2.5 h-2.5 rounded-full bg-suseg-green animate-pulse" />
-            Engenharia e Integração Tecnológica
-          </div>
-          
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight leading-tight text-chombo-dark max-w-4xl mx-auto">
-            Segurança, Conforto e Economia para sua{' '}
-            <span className="text-suseg-green">
-              Casa ou Condomínio.
-            </span>
-          </h1>
-          
-          <p className="text-base sm:text-lg md:text-xl text-slate-500 max-w-3xl mx-auto font-medium">
-            Projetos especializados em segurança eletrônica avançada, automação inteligente e infraestrutura para carregamento de veículos elétricos (EV).
-          </p>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+          {/* Coluna da Esquerda: Textos e CTAs */}
+          <div className="lg:col-span-7 space-y-6 text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-suseg-green/20 bg-suseg-green-light text-suseg-green text-[10px] font-black uppercase tracking-wider">
+              <span className="w-2 h-2 rounded-full bg-suseg-green animate-pulse" />
+              Engenharia e Integração Tecnológica
+            </div>
+            
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight text-chombo-dark">
+              Segurança, Conforto e Economia para sua{' '}
+              <span className="text-suseg-green block sm:inline">
+                Casa ou Condomínio.
+              </span>
+            </h1>
+            
+            <p className="text-base sm:text-lg text-slate-500 font-medium leading-relaxed max-w-2xl">
+              Projetos especializados em segurança eletrônica avançada, automação inteligente e infraestrutura homologada para carregamento de veículos elétricos (EV).
+            </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <a
-              href="#orcamento"
-              onClick={() => handleServiceSelect('')}
-              className="w-full sm:w-auto px-8 py-4 bg-suseg-green hover:bg-suseg-green-dark text-white font-black text-sm rounded-xl transition-all shadow-lg shadow-suseg-green/20 text-center cursor-pointer"
-            >
-              Solicitar Orçamento Gratuito
-            </a>
-            <a
-              href="#calculadora"
-              className="w-full sm:w-auto px-8 py-4 bg-white hover:bg-slate-50 text-slate-650 border border-slate-200 font-bold text-sm rounded-xl transition-all shadow-sm text-center cursor-pointer"
-            >
-              Simulador de Economia EV
-            </a>
+            <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
+              <a
+                href="#orcamento"
+                onClick={() => handleServiceSelect('')}
+                className="w-full sm:w-auto px-8 py-4 bg-suseg-green hover:bg-suseg-green-dark text-white font-black text-sm rounded-xl transition-all shadow-lg shadow-suseg-green/20 text-center cursor-pointer active:scale-[0.98]"
+              >
+                Solicitar Orçamento Gratuito
+              </a>
+              <a
+                href="#calculadora"
+                className="w-full sm:w-auto px-8 py-4 bg-white hover:bg-slate-50 text-slate-650 border border-slate-200 font-bold text-sm rounded-xl transition-all shadow-sm text-center cursor-pointer active:scale-[0.98]"
+              >
+                Simular Economia EV
+              </a>
+            </div>
+          </div>
+
+          {/* Coluna da Direita: Imagem de Destaque (Colagem) */}
+          <div className="lg:col-span-5 relative">
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-100/50 bg-white p-2">
+              <img 
+                src="/hero-collage.png" 
+                alt="Soluções SUSEG" 
+                className="w-full h-auto rounded-2xl object-cover hover:scale-[1.01] transition-transform duration-500" 
+              />
+              
+              {/* Floating Badge */}
+              <div className="absolute bottom-6 left-6 bg-chombo-dark/90 backdrop-blur-md border border-slate-700/50 text-white px-4 py-2.5 rounded-xl shadow-lg flex items-center gap-2.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-suseg-green animate-pulse" />
+                <span className="text-[10px] font-bold uppercase tracking-wider">Projetos 100% Homologados</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
