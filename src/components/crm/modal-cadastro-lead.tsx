@@ -994,6 +994,8 @@ export default function ModalCadastroLead({
                             })
                           )}
                         </div>
+                      </div>
+                    )}
 
                 {/* Campo de Observações */}
                 <div className="space-y-1.5">
