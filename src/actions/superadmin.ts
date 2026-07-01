@@ -286,6 +286,13 @@ export async function getSaaSEmpresas() {
           .limit(1)
           .maybeSingle();
 
+        // Obter WhatsApp de contato público da empresa
+        const { data: whatsConfig } = await supabaseAdmin
+          .from('whatsapp_config')
+          .select('whatsapp_contato')
+          .eq('empresa_id', empresa.id)
+          .maybeSingle();
+
         // Contar leads
         const { count: leadsCount } = await supabaseAdmin
           .from('leads')
@@ -300,6 +307,7 @@ export async function getSaaSEmpresas() {
 
         return {
           ...empresa,
+          whatsapp_contato: whatsConfig?.whatsapp_contato || null,
           mestre: mestre ? {
             id: mestre.id,
             nome: mestre.nome_completo,
