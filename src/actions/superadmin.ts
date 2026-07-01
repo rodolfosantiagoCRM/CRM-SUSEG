@@ -44,6 +44,7 @@ interface CriarEmpresaEClienteParams {
   nome_mestre: string;
   email: string;
   password?: string;
+  whatsapp_contato?: string;
 }
 
 /**
@@ -178,6 +179,35 @@ export async function criarEmpresaECliente(dados: CriarEmpresaEClienteParams) {
     if (membroError) {
       console.warn('[criarEmpresaECliente] Aviso: erro ao criar empresa_membros:', membroError.message);
       // Não é fatal — o trigger já pode ter criado
+    }
+
+    // 6. Criar configuração do WhatsApp se whatsapp_contato for informado
+    if (dados.whatsapp_contato?.trim()) {
+      const cleanPhone = dados.whatsapp_contato.replace(/\D/g, '');
+      if (cleanPhone) {
+        try {
+          const { data: allConfigs } = await supabaseAdmin
+            .from('whatsapp_config')
+            .select('id')
+            .order('id', { ascending: false });
+          const nextId = allConfigs && allConfigs.length > 0 ? Math.max(...allConfigs.map((c: any) => c.id)) + 1 : 1;
+
+          await supabaseAdmin
+            .from('whatsapp_config')
+            .insert({
+              id: nextId,
+              empresa_id: novaEmpresa.id,
+              whatsapp_contato: cleanPhone,
+              ativo: false,
+              api_provider: 'evolution',
+              antecedencia_minutos: 60,
+              mensagem_template: 'Olá {nome_tecnico}, sua próxima visita técnica para o cliente {cliente_nome} no endereço {endereco_obra} será daqui a {antecedencia} (agendada para às {horario_visita}).',
+              updated_at: new Date().toISOString()
+            });
+        } catch (waErr) {
+          console.error('Erro ao configurar whatsapp inicial da nova empresa:', waErr);
+        }
+      }
     }
 
     return {
@@ -332,6 +362,7 @@ export async function getSaaSEmpresas() {
 interface AtualizarEmpresaParams {
   nome_fantasia: string;
   cnpj: string;
+  whatsapp_contato?: string | null;
 }
 
 /**
@@ -370,6 +401,54 @@ export async function atualizarEmpresa(empresaId: string, dados: AtualizarEmpres
     if (error) {
       console.error('Erro ao atualizar empresa:', error);
       return { success: false, error: error.message || 'Erro ao atualizar dados da empresa.' };
+    }
+
+    // 2. Atualizar ou inserir na tabela whatsapp_config o whatsapp_contato
+    if (dados.whatsapp_contato !== undefined) {
+      const cleanPhone = dados.whatsapp_contato ? dados.whatsapp_contato.replace(/\D/g, '') : '';
+      
+      const { data: existing } = await supabaseAdmin
+        .from('whatsapp_config')
+        .select('id')
+        .eq('empresa_id', empresaId)
+        .maybeSingle();
+
+      if (existing) {
+        const { error: waError } = await supabaseAdmin
+          .from('whatsapp_config')
+          .update({
+            whatsapp_contato: cleanPhone || null,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existing.id);
+        if (waError) {
+          console.error('Erro ao atualizar whatsapp_contato:', waError);
+          return { success: false, error: waError.message || 'Erro ao atualizar WhatsApp de contato.' };
+        }
+      } else if (cleanPhone) {
+        const { data: allConfigs } = await supabaseAdmin
+          .from('whatsapp_config')
+          .select('id')
+          .order('id', { ascending: false });
+        const nextId = allConfigs && allConfigs.length > 0 ? Math.max(...allConfigs.map((c: any) => c.id)) + 1 : 1;
+
+        const { error: waError } = await supabaseAdmin
+          .from('whatsapp_config')
+          .insert({
+            id: nextId,
+            empresa_id: empresaId,
+            whatsapp_contato: cleanPhone,
+            ativo: false,
+            api_provider: 'evolution',
+            antecedencia_minutos: 60,
+            mensagem_template: 'Olá {nome_tecnico}, sua próxima visita técnica para o cliente {cliente_nome} no endereço {endereco_obra} será daqui a {antecedencia} (agendada para às {horario_visita}).',
+            updated_at: new Date().toISOString()
+          });
+        if (waError) {
+          console.error('Erro ao criar whatsapp_contato:', waError);
+          return { success: false, error: waError.message || 'Erro ao salvar WhatsApp de contato.' };
+        }
+      }
     }
 
     return { success: true };

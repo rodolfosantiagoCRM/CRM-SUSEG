@@ -67,7 +67,8 @@ export default function SuperAdminDashboard() {
     cnpj: '',
     nome_mestre: '',
     email: '',
-    password: ''
+    password: '',
+    whatsapp_contato: ''
   });
   const [createLoading, setCreateLoading] = useState(false);
 
@@ -104,7 +105,8 @@ export default function SuperAdminDashboard() {
   // Form de Edição de Empresa
   const [editCompanyForm, setEditCompanyForm] = useState({
     nome_fantasia: '',
-    cnpj: ''
+    cnpj: '',
+    whatsapp_contato: ''
   });
   const [editLoading, setEditLoading] = useState(false);
 
@@ -178,7 +180,8 @@ export default function SuperAdminDashboard() {
           cnpj: '',
           nome_mestre: '',
           email: '',
-          password: ''
+          password: '',
+          whatsapp_contato: ''
         });
         loadData();
       } else {
@@ -706,7 +709,8 @@ export default function SuperAdminDashboard() {
                             setSelectedEmpresa(emp);
                             setEditCompanyForm({
                               nome_fantasia: emp.nome_fantasia,
-                              cnpj: emp.cnpj
+                              cnpj: emp.cnpj,
+                              whatsapp_contato: emp.whatsapp_contato || ''
                             });
                             setIsEditModalOpen(true);
                           }}
@@ -822,6 +826,18 @@ export default function SuperAdminDashboard() {
                   placeholder="Apenas números ou formato CNPJ"
                   value={newCompanyForm.cnpj}
                   onChange={(e) => setNewCompanyForm({...newCompanyForm, cnpj: e.target.value})}
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 rounded-xl py-2.5 px-4 text-xs outline-none text-slate-200 placeholder:text-slate-650"
+                />
+              </div>
+
+              {/* WhatsApp de Contato do Site */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">WhatsApp de Contato do Site</label>
+                <input
+                  type="text"
+                  placeholder="Ex: 5541999999999 (Apenas números, opcional)"
+                  value={newCompanyForm.whatsapp_contato}
+                  onChange={(e) => setNewCompanyForm({...newCompanyForm, whatsapp_contato: e.target.value})}
                   className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 rounded-xl py-2.5 px-4 text-xs outline-none text-slate-200 placeholder:text-slate-650"
                 />
               </div>
@@ -1224,6 +1240,21 @@ export default function SuperAdminDashboard() {
                   onChange={(e) => setEditCompanyForm({...editCompanyForm, cnpj: e.target.value})}
                   className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 rounded-xl py-2.5 px-4 text-xs outline-none text-slate-200 placeholder:text-slate-500"
                 />
+              </div>
+
+              {/* WhatsApp de Contato do Site */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">WhatsApp de Contato do Site</label>
+                <input
+                  type="text"
+                  placeholder="Ex: 5541999999999 (Apenas números)"
+                  value={editCompanyForm.whatsapp_contato}
+                  onChange={(e) => setEditCompanyForm({...editCompanyForm, whatsapp_contato: e.target.value})}
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 rounded-xl py-2.5 px-4 text-xs outline-none text-slate-200 placeholder:text-slate-500"
+                />
+                <p className="text-[9px] text-slate-500">
+                  * Usado para o botão de WhatsApp na Landing Page deste inquilino.
+                </p>
               </div>
 
               <div className="pt-4 border-t border-slate-850 flex items-center justify-end gap-3">

@@ -532,6 +532,42 @@ export async function triggerManualCheck(): Promise<{ success: boolean; sentCoun
 export async function getPublicWhatsappNumber(): Promise<string> {
   try {
     const supabase = createServerClient();
+    
+    // 1. Tentar obter a empresa "SUSEG" ou qualquer empresa do tenant
+    const { data: susegEmpresa } = await supabase
+      .from('empresas')
+      .select('id')
+      .ilike('nome_fantasia', '%suseg%')
+      .limit(1)
+      .maybeSingle();
+
+    let targetEmpresaId = susegEmpresa?.id;
+
+    // 2. Se não encontrar "SUSEG", buscar a primeira empresa cadastrada
+    if (!targetEmpresaId) {
+      const { data: primeiraEmpresa } = await supabase
+        .from('empresas')
+        .select('id')
+        .order('criado_em', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      
+      targetEmpresaId = primeiraEmpresa?.id;
+    }
+
+    if (targetEmpresaId) {
+      const { data, error } = await supabase
+        .from('whatsapp_config')
+        .select('whatsapp_contato')
+        .eq('empresa_id', targetEmpresaId)
+        .maybeSingle();
+
+      if (!error && data?.whatsapp_contato) {
+        return data.whatsapp_contato;
+      }
+    }
+
+    // 3. Fallback para o ID global/padrão
     const { data, error } = await supabase
       .from('whatsapp_config')
       .select('whatsapp_contato')
