@@ -5,6 +5,7 @@ import SusegLogo from '@/components/public/suseg-logo';
 import LeadForm from '@/components/public/lead-form';
 import EvCalculator from '@/components/public/ev-calculator';
 import WhatsAppButton from '@/components/public/whatsapp-button';
+import CasanLogo from '@/components/public/casan-logo';
 
 interface Installation {
   id: number;
@@ -204,6 +205,36 @@ export default function LandingPage() {
             >
               Simulador de Economia EV
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Seção de Clientes e Parceiros */}
+      <section className="bg-white py-12 border-b border-slate-100/80">
+        <div className="max-w-6xl mx-auto px-6">
+          <p className="text-center text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-400 mb-8">
+            Empresas parceiras e clientes atendidos pela SUSEG
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-10 sm:gap-16 md:gap-24">
+            {/* CASAN Logo */}
+            <div className="flex items-center gap-3 group border border-slate-100 rounded-2xl p-3 bg-slate-50/50 hover:bg-slate-50 transition-colors shadow-sm" title="Parceria de longos anos">
+              <CasanLogo className="h-10" />
+              <div className="flex flex-col text-left">
+                <span className="text-xs font-black text-slate-700 leading-none">CASAN</span>
+                <span className="text-[8px] font-bold text-suseg-green tracking-wider uppercase mt-1">Parceiro há anos</span>
+              </div>
+            </div>
+
+            {/* Outras marcas em estilo texto sóbrio e profissional */}
+            <div className="flex items-center gap-2 text-slate-350 hover:text-slate-500 transition-colors">
+              <span className="text-xs font-black uppercase tracking-widest text-slate-400">Construtora Sul</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-350 hover:text-slate-500 transition-colors">
+              <span className="text-xs font-black uppercase tracking-widest text-slate-400">Shopping Centro</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-350 hover:text-slate-500 transition-colors">
+              <span className="text-xs font-black uppercase tracking-widest text-slate-400">Jardim Botânico Condomínio</span>
+            </div>
           </div>
         </div>
       </section>
