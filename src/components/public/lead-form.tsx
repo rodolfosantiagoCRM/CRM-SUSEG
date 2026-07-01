@@ -3,17 +3,19 @@
 import React, { useState } from 'react';
 import { leadsService } from '@/services/leadsService';
 
-export default function LeadForm() {
+export default function LeadForm({ defaultService = '' }: { defaultService?: string }) {
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
     telefone: '',
-    cidade: '',
-    area_m2: '',
-    endereco: '',
-    numero: '',
     tipo_servico: '',
   });
+
+  React.useEffect(() => {
+    if (defaultService) {
+      setFormData((prev) => ({ ...prev, tipo_servico: defaultService }));
+    }
+  }, [defaultService]);
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -34,15 +36,15 @@ export default function LeadForm() {
         nome: formData.nome,
         email: formData.email || null,
         telefone: formData.telefone,
-        cidade: formData.cidade,
-        area_m2: formData.area_m2 ? parseFloat(formData.area_m2) : null,
-        endereco_obra: formData.endereco ? `${formData.endereco}${formData.numero ? `, ${formData.numero}` : ''}` : null,
-        numero: formData.numero || null,
+        cidade: 'Curitiba', // Default city to satisfy database NOT NULL constraint
+        area_m2: null,
+        endereco_obra: null,
+        numero: null,
         tipo_servico: formData.tipo_servico || null,
       });
 
       setSuccess(true);
-      setFormData({ nome: '', email: '', telefone: '', cidade: '', area_m2: '', endereco: '', numero: '', tipo_servico: '' });
+      setFormData({ nome: '', email: '', telefone: '', tipo_servico: '' });
     } catch (err: any) {
       console.error('Falha ao enviar lead:', err);
       setError(err.message || 'Ocorreu um erro ao enviar seus dados. Tente novamente.');
@@ -53,19 +55,19 @@ export default function LeadForm() {
 
   if (success) {
     return (
-      <div className="text-center py-12 space-y-4">
-        <div className="w-16 h-16 bg-orange-500/10 border border-orange-500/30 text-orange-400 rounded-full flex items-center justify-center mx-auto animate-bounce">
+      <div className="text-center py-10 space-y-4">
+        <div className="w-16 h-16 bg-suseg-green-light border border-suseg-green/30 text-suseg-green rounded-full flex items-center justify-center mx-auto animate-bounce">
           <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h4 className="text-xl font-bold text-slate-200">Solicitação Enviada!</h4>
-        <p className="text-sm text-slate-400 max-w-sm mx-auto">
-          Agradecemos seu contato. Nossa equipe analisará as dimensões informadas e retornará em até 24 horas úteis.
+        <h4 className="text-xl font-bold text-chombo">Solicitação Enviada!</h4>
+        <p className="text-sm text-slate-550 max-w-sm mx-auto">
+          Agradecemos seu contato. Nossa equipe de engenharia analisará sua solicitação e entrará em contato via WhatsApp em breve.
         </p>
         <button
           onClick={() => setSuccess(false)}
-          className="mt-6 text-sm text-orange-400 hover:text-orange-300 transition-colors font-medium underline cursor-pointer"
+          className="mt-6 text-sm text-suseg-green hover:text-suseg-green-dark transition-colors font-bold underline cursor-pointer"
         >
           Enviar outra solicitação
         </button>
@@ -74,9 +76,9 @@ export default function LeadForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-1.5">
-        <label htmlFor="nome" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+        <label htmlFor="nome" className="text-[10px] font-bold uppercase tracking-widest text-slate-450">
           Nome Completo
         </label>
         <input
@@ -86,15 +88,15 @@ export default function LeadForm() {
           value={formData.nome}
           onChange={handleChange}
           required
-          placeholder="Ex: João Silva"
-          className="w-full bg-slate-950 border border-slate-800 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 rounded-lg px-4 py-3 text-slate-200 placeholder-slate-650 outline-none transition-all text-sm"
+          placeholder="Ex: João da Silva"
+          className="w-full bg-white border border-slate-200 focus:border-suseg-green focus:ring-2 focus:ring-suseg-green/10 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 outline-none transition-all text-sm font-semibold"
         />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label htmlFor="telefone" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-            Telefone / WhatsApp
+          <label htmlFor="telefone" className="text-[10px] font-bold uppercase tracking-widest text-slate-450">
+            WhatsApp / Celular
           </label>
           <input
             type="tel"
@@ -103,12 +105,12 @@ export default function LeadForm() {
             value={formData.telefone}
             onChange={handleChange}
             required
-            placeholder="(00) 00000-0000"
-            className="w-full bg-slate-950 border border-slate-800 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 rounded-lg px-4 py-3 text-slate-200 placeholder-slate-650 outline-none transition-all text-sm"
+            placeholder="(00) 99999-0000"
+            className="w-full bg-white border border-slate-200 focus:border-suseg-green focus:ring-2 focus:ring-suseg-green/10 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 outline-none transition-all text-sm font-semibold"
           />
         </div>
         <div className="space-y-1.5">
-          <label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+          <label htmlFor="email" className="text-[10px] font-bold uppercase tracking-widest text-slate-450">
             E-mail
           </label>
           <input
@@ -118,80 +120,15 @@ export default function LeadForm() {
             value={formData.email}
             onChange={handleChange}
             required
-            placeholder="nome@email.com"
-            className="w-full bg-slate-950 border border-slate-800 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 rounded-lg px-4 py-3 text-slate-200 placeholder-slate-650 outline-none transition-all text-sm"
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="space-y-1.5">
-          <label htmlFor="cidade" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-            Cidade / UF
-          </label>
-          <input
-            type="text"
-            id="cidade"
-            name="cidade"
-            value={formData.cidade}
-            onChange={handleChange}
-            required
-            placeholder="Ex: Curitiba / PR"
-            className="w-full bg-slate-950 border border-slate-800 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 rounded-lg px-4 py-3 text-slate-200 placeholder-slate-650 outline-none transition-all text-sm"
-          />
-        </div>
-        <div className="space-y-1.5">
-          <label htmlFor="area_m2" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-            Área estimada (m²)
-          </label>
-          <input
-            type="number"
-            id="area_m2"
-            name="area_m2"
-            value={formData.area_m2}
-            onChange={handleChange}
-            required
-            min="5"
-            placeholder="Ex: 120"
-            className="w-full bg-slate-950 border border-slate-800 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 rounded-lg px-4 py-3 text-slate-200 placeholder-slate-650 outline-none transition-all text-sm"
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
-        <div className="space-y-1.5 sm:col-span-8">
-          <label htmlFor="endereco" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-            Endereço (Rua, Avenida)
-          </label>
-          <input
-            type="text"
-            id="endereco"
-            name="endereco"
-            value={formData.endereco}
-            onChange={handleChange}
-            placeholder="Ex: Av. Sete de Setembro"
-            className="w-full bg-slate-950 border border-slate-800 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 rounded-lg px-4 py-3 text-slate-200 placeholder-slate-650 outline-none transition-all text-sm"
-          />
-        </div>
-        <div className="space-y-1.5 sm:col-span-4">
-          <label htmlFor="numero" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-            Número
-          </label>
-          <input
-            type="text"
-            id="numero"
-            name="numero"
-            value={formData.numero}
-            onChange={handleChange}
-            placeholder="Ex: 405"
-            className="w-full bg-slate-950 border border-slate-800 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 rounded-lg px-4 py-3 text-slate-200 placeholder-slate-650 outline-none transition-all text-sm"
+            placeholder="nome@exemplo.com"
+            className="w-full bg-white border border-slate-200 focus:border-suseg-green focus:ring-2 focus:ring-suseg-green/10 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 outline-none transition-all text-sm font-semibold"
           />
         </div>
       </div>
 
       <div className="space-y-1.5">
-        <label htmlFor="tipo_servico" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-          Tipo de Serviço
+        <label htmlFor="tipo_servico" className="text-[10px] font-bold uppercase tracking-widest text-slate-450">
+          Serviço de Interesse
         </label>
         <div className="relative">
           <select
@@ -200,22 +137,21 @@ export default function LeadForm() {
             value={formData.tipo_servico}
             onChange={handleChange}
             required
-            className="w-full bg-slate-950 border border-slate-800 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 rounded-lg px-4 py-3 text-slate-200 outline-none transition-all text-sm appearance-none cursor-pointer"
+            className="w-full bg-white border border-slate-200 focus:border-suseg-green focus:ring-2 focus:ring-suseg-green/10 rounded-xl px-4 py-3 text-slate-805 outline-none transition-all text-sm appearance-none cursor-pointer font-semibold"
           >
-            <option value="" disabled>Selecione o serviço desejado</option>
-            <option value="Instalação Sistemas Solares">Instalação Sistemas Solares</option>
-            <option value="Limpeza de placas Solares">Limpeza de placas Solares</option>
-            <option value="Aquecimento de piso">Aquecimento de piso</option>
-            <option value="Carregamento Veicular">Carregamento Veicular</option>
+            <option value="" disabled>Selecione o serviço</option>
+            <option value="Carregamento Veicular">Carregamento Veicular (Infraestrutura EV)</option>
+            <option value="Automação Residencial e Predial">Automação Residencial e Predial</option>
+            <option value="Segurança Eletrônica">Segurança Eletrônica (CFTV, Alarme, Acesso)</option>
           </select>
           <svg className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
           </svg>
         </div>
       </div>
 
       {error && (
-        <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs rounded-lg">
+        <div className="p-3 bg-red-50 border border-red-200 text-red-650 text-xs rounded-xl font-semibold">
           {error}
         </div>
       )}
@@ -223,7 +159,7 @@ export default function LeadForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-4 mt-2 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 disabled:opacity-50 text-white font-bold rounded-xl transition-all shadow-xl shadow-orange-500/15 flex items-center justify-center gap-2 cursor-pointer"
+        className="w-full py-4 mt-2 bg-suseg-green hover:bg-suseg-green-dark disabled:opacity-50 text-white font-black text-sm rounded-xl transition-all shadow-md shadow-suseg-green/15 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
       >
         {loading ? (
           <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
@@ -231,7 +167,7 @@ export default function LeadForm() {
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
         ) : (
-          'Solicitar Análise Gratuita'
+          'Solicitar Orçamento Gratuito'
         )}
       </button>
     </form>
