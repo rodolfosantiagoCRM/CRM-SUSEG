@@ -63,10 +63,10 @@ export default function CarregamentoVeicularPage() {
           
           <nav className="hidden md:flex space-x-8 text-sm font-bold text-slate-500">
             <Link href="/" className="hover:text-suseg-green transition-colors">Página Inicial</Link>
+            <Link href="/carregamento-veicular" className="hover:text-suseg-green transition-colors">Carregamento Veicular</Link>
+            <Link href="/seguranca-automacao" className="hover:text-suseg-green transition-colors">Segurança & Automação</Link>
             <a href="#beneficios" className="hover:text-suseg-green transition-colors">Por Que SUSEG</a>
-            <a href="#funcionamento" className="hover:text-suseg-green transition-colors">Como Funciona</a>
             <a href="#simulador" className="hover:text-suseg-green transition-colors">Simulador</a>
-            <a href="#faq" className="hover:text-suseg-green transition-colors">Dúvidas</a>
             <a href="/login" className="text-suseg-green hover:text-suseg-green-dark transition-colors font-extrabold flex items-center gap-1">
               Acessar CRM
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -395,14 +395,16 @@ export default function CarregamentoVeicularPage() {
               <SusegLogo showText={true} />
             </Link>
           </div>
-          <div className="flex justify-center space-x-6 text-slate-400 font-bold">
+          <div className="flex justify-center flex-wrap gap-y-2 gap-x-6 text-slate-400 font-bold">
             <Link href="/" className="hover:text-suseg-green">Página Inicial</Link>
+            <span>•</span>
+            <Link href="/carregamento-veicular" className="hover:text-suseg-green">Carregamento Veicular</Link>
+            <span>•</span>
+            <Link href="/seguranca-automacao" className="hover:text-suseg-green">Segurança & Automação</Link>
             <span>•</span>
             <a href="#beneficios" className="hover:text-suseg-green">Por Que SUSEG</a>
             <span>•</span>
             <a href="#simulador" className="hover:text-suseg-green">Simulador</a>
-            <span>•</span>
-            <a href="#faq" className="hover:text-suseg-green">Dúvidas</a>
           </div>
           <p className="max-w-md mx-auto text-slate-400 font-medium">
             SUSEG Engenharia & Automação © 2026. Todos os direitos reservados. Soluções premium de infraestrutura elétrica e mobilidade.

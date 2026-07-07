@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import SusegLogo from '@/components/public/suseg-logo';
 import LeadForm from '@/components/public/lead-form';
 import EvCalculator from '@/components/public/ev-calculator';
@@ -99,24 +100,25 @@ export default function LandingPage() {
       link: '/carregamento-veicular',
     },
     {
-      title: 'Projetos Elétricos',
-      description: 'Desenvolvimento completo de projetos elétricos residenciais e comerciais. Análise técnica de cargas, dimensionamento exato de circuitos, especificação detalhada de materiais e prevenção de falhas.',
+      title: 'Segurança & Automação',
+      description: 'Sistemas inteligentes de segurança eletrônica (CFTV IP, alarmes monitorados, biometria facial) e automação de iluminação, persianas e climatização de alto padrão.',
+      icon: (
+        <svg className="w-8 h-8 text-suseg-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+      ),
+      tag: 'Segurança e Automação',
+      link: '/seguranca-automacao',
+    },
+    {
+      title: 'Projetos Elétricos & Padrão CELESC',
+      description: 'Desenvolvimento de projetos elétricos residenciais/comerciais completos, dimensionamento técnico e instalação homologada do padrão de entrada de energia seguindo as normas da CELESC.',
       icon: (
         <svg className="w-8 h-8 text-suseg-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
         </svg>
       ),
       tag: 'Projetos Elétricos',
-    },
-    {
-      title: 'Padrão de Entrada CELESC',
-      description: 'Adequação e instalação de padrão de entrada seguindo as normas da CELESC (Norma N-321.0001). Instalação de kit postinho 380V/220V com DPS, aterramento (NBR 13571) e conformidade técnica total.',
-      icon: (
-        <svg className="w-8 h-8 text-suseg-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-        </svg>
-      ),
-      tag: 'Padrão Celesc',
     },
   ];
 
@@ -218,9 +220,11 @@ export default function LandingPage() {
           <SusegLogo />
           
           <nav className="hidden md:flex space-x-8 text-sm font-bold text-slate-500">
-            <a href="#servicos" className="hover:text-suseg-green transition-colors">Serviços</a>
+            <Link href="/" className="hover:text-suseg-green transition-colors">Página Inicial</Link>
+            <Link href="/carregamento-veicular" className="hover:text-suseg-green transition-colors">Carregamento Veicular</Link>
+            <Link href="/seguranca-automacao" className="hover:text-suseg-green transition-colors">Segurança & Automação</Link>
+            <a href="#servicos" className="hover:text-suseg-green transition-colors">Projetos & Padrões</a>
             <a href="#calculadora" className="hover:text-suseg-green transition-colors">Simulador EV</a>
-            <a href="#galeria" className="hover:text-suseg-green transition-colors">Portfólio</a>
             <a href="/login" className="text-suseg-green hover:text-suseg-green-dark transition-colors font-extrabold flex items-center gap-1">
               Acessar CRM
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -608,14 +612,16 @@ export default function LandingPage() {
           <div className="flex justify-center">
             <SusegLogo showText={true} />
           </div>
-          <div className="flex justify-center space-x-6 text-slate-400 font-bold">
-            <a href="#servicos" className="hover:text-suseg-green">Serviços</a>
+          <div className="flex justify-center flex-wrap gap-y-2 gap-x-6 text-slate-400 font-bold">
+            <Link href="/" className="hover:text-suseg-green">Página Inicial</Link>
+            <span>•</span>
+            <Link href="/carregamento-veicular" className="hover:text-suseg-green">Carregamento Veicular</Link>
+            <span>•</span>
+            <Link href="/seguranca-automacao" className="hover:text-suseg-green">Segurança & Automação</Link>
+            <span>•</span>
+            <a href="#servicos" className="hover:text-suseg-green">Projetos & Padrões</a>
             <span>•</span>
             <a href="#calculadora" className="hover:text-suseg-green">Simulador EV</a>
-            <span>•</span>
-            <a href="#galeria" className="hover:text-suseg-green">Portfólio</a>
-            <span>•</span>
-            <a href="/login" className="hover:text-suseg-green">CRM</a>
           </div>
           <p className="max-w-md mx-auto text-slate-400 font-medium">
             SUSEG Engenharia & Automação © 2026. Todos os direitos reservados. Soluções premium de segurança residencial e condomínio.
