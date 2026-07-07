@@ -605,6 +605,8 @@ export default function LandingPage() {
             <a href="#servicos" className="hover:text-suseg-green">Projetos & Padrões</a>
             <span>•</span>
             <a href="#calculadora" className="hover:text-suseg-green">Simulador EV</a>
+            <span>•</span>
+            <Link href="/login" className="hover:text-suseg-green">Acessar CRM</Link>
           </div>
           <p className="max-w-md mx-auto text-slate-400 font-medium">
             SUSEG Engenharia & Automação © 2026. Todos os direitos reservados. Soluções premium de segurança residencial e condomínio.

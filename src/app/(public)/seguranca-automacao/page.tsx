@@ -425,6 +425,8 @@ export default function SegurancaAutomacaoPage() {
             <a href="#solucoes" className="hover:text-suseg-green">Soluções</a>
             <span>•</span>
             <a href="#faq" className="hover:text-suseg-green">Dúvidas</a>
+            <span>•</span>
+            <Link href="/login" className="hover:text-suseg-green">Acessar CRM</Link>
           </div>
           <p className="max-w-md mx-auto text-slate-400 font-medium">
             SUSEG Engenharia & Automação © 2026. Todos os direitos reservados. Soluções premium de segurança eletrônica, alarmes e automação inteligente.

@@ -405,6 +405,8 @@ export default function CarregamentoVeicularPage() {
             <a href="#beneficios" className="hover:text-suseg-green">Por Que SUSEG</a>
             <span>•</span>
             <a href="#simulador" className="hover:text-suseg-green">Simulador</a>
+            <span>•</span>
+            <Link href="/login" className="hover:text-suseg-green">Acessar CRM</Link>
           </div>
           <p className="max-w-md mx-auto text-slate-400 font-medium">
             SUSEG Engenharia & Automação © 2026. Todos os direitos reservados. Soluções premium de infraestrutura elétrica e mobilidade.
