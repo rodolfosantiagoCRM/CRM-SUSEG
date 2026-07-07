@@ -8,7 +8,7 @@ interface SusegLogoProps {
   textColor?: string;
 }
 
-export default function SusegLogo({ className = 'h-12' }: SusegLogoProps) {
+export default function SusegLogo({ className = 'h-24 md:h-28 translate-y-1.5' }: SusegLogoProps) {
   return (
     <div className={`flex items-center ${className}`}>
       <img
