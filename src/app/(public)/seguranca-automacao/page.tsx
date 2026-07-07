@@ -121,15 +121,7 @@ export default function SegurancaAutomacaoPage() {
           <nav className="hidden md:flex space-x-8 text-sm font-bold text-slate-500">
             <Link href="/" className="hover:text-suseg-green transition-colors">Página Inicial</Link>
             <Link href="/carregamento-veicular" className="hover:text-suseg-green transition-colors">Carregamento Veicular</Link>
-            <a href="#solucoes" className="hover:text-suseg-green transition-colors">Soluções</a>
-            <a href="#funcionamento" className="hover:text-suseg-green transition-colors">Como Funciona</a>
-            <a href="#faq" className="hover:text-suseg-green transition-colors">Dúvidas</a>
-            <a href="/login" className="text-suseg-green hover:text-suseg-green-dark transition-colors font-extrabold flex items-center gap-1">
-              Acessar CRM
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </a>
+            <Link href="/seguranca-automacao" className="hover:text-suseg-green transition-colors">Segurança & Automação</Link>
           </nav>
           
           <a
