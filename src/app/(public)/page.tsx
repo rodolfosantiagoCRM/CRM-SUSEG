@@ -88,34 +88,35 @@ export default function LandingPage() {
   // Lista de Serviços
   const services = [
     {
-      title: 'Carregamento Veicular',
-      description: 'Infraestrutura de recarga inteligente e segura (Wallbox) para residências, comércios e condomínios de qualquer porte.',
+      title: 'Carregadores Veiculares',
+      description: 'Instalação profissional de carregadores veiculares (Wallbox) em residências, empresas e condomínios. Vistoria técnica prévia, ART/TRT, Load Management e conformidade com as normas NBR 17019 e NBR 5410.',
       icon: (
         <svg className="w-8 h-8 text-suseg-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
       ),
       tag: 'Carregamento Veicular',
+      link: '/carregamento-veicular',
     },
     {
-      title: 'Automação Residencial e Predial',
-      description: 'Gestão integrada de iluminação, climatização, áudio e vídeo. Conforto térmico e eficiência na palma da sua mão.',
+      title: 'Projetos Elétricos',
+      description: 'Desenvolvimento completo de projetos elétricos residenciais e comerciais. Análise técnica de cargas, dimensionamento exato de circuitos, especificação detalhada de materiais e prevenção de falhas.',
       icon: (
         <svg className="w-8 h-8 text-suseg-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
         </svg>
       ),
-      tag: 'Automação Residencial e Predial',
+      tag: 'Projetos Elétricos',
     },
     {
-      title: 'Segurança Eletrônica',
-      description: 'Monitoramento 24h por alarmes, câmeras CFTV IP de alta definição, sensores de barreira e controle de acesso facial.',
+      title: 'Padrão de Entrada CELESC',
+      description: 'Adequação e instalação de padrão de entrada seguindo as normas da CELESC (Norma N-321.0001). Instalação de kit postinho 380V/220V com DPS, aterramento (NBR 13571) e conformidade técnica total.',
       icon: (
         <svg className="w-8 h-8 text-suseg-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
         </svg>
       ),
-      tag: 'Segurança Eletrônica',
+      tag: 'Padrão Celesc',
     },
   ];
 
@@ -196,7 +197,11 @@ export default function LandingPage() {
     },
   ];
 
-  const handleServiceSelect = (serviceTag: string) => {
+  const handleServiceSelect = (serviceTag: string, link?: string) => {
+    if (link) {
+      window.location.href = link;
+      return;
+    }
     setSelectedService(serviceTag);
     const formElement = document.getElementById('orcamento');
     if (formElement) {
@@ -244,18 +249,18 @@ export default function LandingPage() {
           <div className="lg:col-span-7 space-y-6 text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-suseg-green/20 bg-suseg-green-light text-suseg-green text-[10px] font-black uppercase tracking-wider">
               <span className="w-2 h-2 rounded-full bg-suseg-green animate-pulse" />
-              Engenharia e Integração Tecnológica
+              Engenharia Elétrica & Eletromobilidade
             </div>
             
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight text-chombo-dark">
-              Segurança, Conforto e Economia para sua{' '}
+              Infraestrutura Elétrica e Recarga de{' '}
               <span className="text-suseg-green block sm:inline">
-                Casa ou Condomínio.
+                Alta Performance.
               </span>
             </h1>
             
             <p className="text-base sm:text-lg text-slate-500 font-medium leading-relaxed max-w-2xl">
-              Projetos especializados em segurança eletrônica avançada, automação inteligente e infraestrutura homologada para carregamento de veículos elétricos (EV).
+              Projetos elétricos completos, instalação homologada de carregadores veiculares (NBR 17019) e adequação de padrão de entrada CELESC com total segurança e conformidade técnica.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
@@ -359,10 +364,10 @@ export default function LandingPage() {
                 
                 <div className="pt-8">
                   <button
-                    onClick={() => handleServiceSelect(svc.tag)}
+                    onClick={() => handleServiceSelect(svc.tag, svc.link)}
                     className="w-full py-3 bg-slate-50 group-hover:bg-suseg-green group-hover:text-white text-slate-600 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                   >
-                    <span>Saber Mais & Orçar</span>
+                    <span>{svc.link ? 'Ver Página Dedicada' : 'Saber Mais & Orçar'}</span>
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
                     </svg>
@@ -450,7 +455,7 @@ export default function LandingPage() {
                       ))}
                     </div>
                     <p className="text-slate-500 text-sm leading-relaxed italic font-medium">
-                      "{t.comment}"
+                      {`"${t.comment}"`}
                     </p>
                   </div>
 
@@ -483,7 +488,7 @@ export default function LandingPage() {
                 Conte-nos seu projeto
               </h2>
               <p className="text-slate-500 leading-relaxed font-semibold">
-                Seja para carregadores veiculares, automação, segurança ou portões automáticos, desenvolvemos uma solução sob medida para você.
+                Seja para instalação de carregadores veiculares, projetos elétricos comerciais/residenciais ou adequação de padrão de entrada CELESC, nossa engenharia entrega a solução ideal para o seu imóvel.
               </p>
               <p className="text-sm text-suseg-green font-extrabold tracking-wide uppercase">
                 Preencha o formulário e receba seu orçamento gratuito.
