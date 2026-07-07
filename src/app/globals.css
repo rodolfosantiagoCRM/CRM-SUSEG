@@ -91,3 +91,26 @@ body {
   font-family: var(--font-sans);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* Infinite Horizontal Marquee Carousel */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.3333%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 25s linear infinite;
+}
+
+
+.mask-gradient-marquee {
+  mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+}
+

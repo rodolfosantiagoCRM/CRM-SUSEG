@@ -21,6 +21,7 @@ export default function LandingPage() {
   const [selectedService, setSelectedService] = useState('');
   const [activeImage, setActiveImage] = useState<Installation | null>(null);
   const [whatsappNumber, setWhatsappNumber] = useState('5541999999999');
+  const [isMarqueePaused, setIsMarqueePaused] = useState(false);
 
   React.useEffect(() => {
     async function loadWhatsapp() {
@@ -33,6 +34,56 @@ export default function LandingPage() {
     }
     loadWhatsapp();
   }, []);
+
+  // Lista de Parceiros e Clientes
+  const partners = [
+    {
+      id: 'casan',
+      name: 'CASAN',
+      tag: 'Parceiro há anos',
+      logo: <CasanLogo className="h-10 w-auto text-[#007A3E] shrink-0" />,
+      title: 'CASAN - Parceria de longos anos',
+    },
+    {
+      id: 'construtora-sul',
+      name: 'CONSTRUTORA SUL',
+      tag: 'Cliente Atendido',
+      logo: (
+        <div className="w-10 h-10 bg-suseg-green-light text-suseg-green rounded-xl flex items-center justify-center transition-all duration-300 group-hover:bg-suseg-green group-hover:text-white shrink-0">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+        </div>
+      ),
+      title: 'Construtora Sul - Cliente Atendido',
+    },
+    {
+      id: 'shopping-centro',
+      name: 'SHOPPING CENTRO',
+      tag: 'Cliente Atendido',
+      logo: (
+        <div className="w-10 h-10 bg-suseg-green-light text-suseg-green rounded-xl flex items-center justify-center transition-all duration-300 group-hover:bg-suseg-green group-hover:text-white shrink-0">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+        </div>
+      ),
+      title: 'Shopping Centro - Cliente Atendido',
+    },
+    {
+      id: 'jardim-botanico',
+      name: 'JARDIM BOTÂNICO',
+      tag: 'Condomínio Residencial',
+      logo: (
+        <div className="w-10 h-10 bg-suseg-green-light text-suseg-green rounded-xl flex items-center justify-center transition-all duration-300 group-hover:bg-suseg-green group-hover:text-white shrink-0">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+        </div>
+      ),
+      title: 'Jardim Botânico Condomínio - Cliente Atendido',
+    },
+  ];
 
   // Lista de Serviços
   const services = [
@@ -244,30 +295,40 @@ export default function LandingPage() {
       </section>
 
       {/* Seção de Clientes e Parceiros */}
-      <section className="bg-white py-12 border-b border-slate-100/80">
-        <div className="max-w-6xl mx-auto px-6">
-          <p className="text-center text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-400 mb-8">
+      <section className="bg-white py-16 border-b border-slate-100/80 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6">
+          <p className="text-center text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-400 mb-10">
             Empresas parceiras e clientes atendidos pela SUSEG
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-10 sm:gap-16 md:gap-24">
-            {/* CASAN Logo */}
-            <div className="flex items-center gap-3 group border border-slate-100 rounded-2xl p-3 bg-slate-50/50 hover:bg-slate-50 transition-colors shadow-sm" title="Parceria de longos anos">
-              <CasanLogo className="h-10" />
-              <div className="flex flex-col text-left">
-                <span className="text-xs font-black text-slate-700 leading-none">CASAN</span>
-                <span className="text-[8px] font-bold text-suseg-green tracking-wider uppercase mt-1">Parceiro há anos</span>
-              </div>
-            </div>
-
-            {/* Outras marcas em estilo texto sóbrio e profissional */}
-            <div className="flex items-center gap-2 text-slate-350 hover:text-slate-500 transition-colors">
-              <span className="text-xs font-black uppercase tracking-widest text-slate-400">Construtora Sul</span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-350 hover:text-slate-500 transition-colors">
-              <span className="text-xs font-black uppercase tracking-widest text-slate-400">Shopping Centro</span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-350 hover:text-slate-500 transition-colors">
-              <span className="text-xs font-black uppercase tracking-widest text-slate-400">Jardim Botânico Condomínio</span>
+          <div className="relative w-full overflow-hidden mask-gradient-marquee">
+            <div
+              className="flex w-max animate-marquee"
+              style={{ animationPlayState: isMarqueePaused ? 'paused' : 'running' }}
+              onMouseEnter={() => setIsMarqueePaused(true)}
+              onMouseLeave={() => setIsMarqueePaused(false)}
+            >
+              {/* Repetir 3 vezes para garantir efeito contínuo em telas grandes */}
+              {[0, 1, 2].map((idx) => (
+                <div key={idx} className="flex gap-12 pr-12 shrink-0">
+                  {partners.map((partner) => (
+                    <div
+                      key={`${idx}-${partner.id}`}
+                      className="flex items-center gap-3 border border-slate-100 rounded-2xl p-4 bg-slate-50/50 hover:bg-white hover:border-suseg-green/30 hover:shadow-lg hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 shadow-sm select-none cursor-pointer group shrink-0"
+                      title={partner.title}
+                    >
+                      {partner.logo}
+                      <div className="flex flex-col text-left">
+                        <span className="text-xs font-black text-slate-700 leading-none group-hover:text-chombo-dark transition-colors">
+                          {partner.name}
+                        </span>
+                        <span className="text-[8px] font-bold text-suseg-green tracking-wider uppercase mt-1">
+                          {partner.tag}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
             </div>
           </div>
         </div>
