@@ -252,6 +252,9 @@ export default function SegurancaAutomacaoPage() {
                     Entrar em Contato
                   </a>
                 </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
