@@ -14,8 +14,7 @@ interface Installation {
   title: string;
   category: string;
   description: string;
-  gradient: string;
-  icon: React.ReactNode;
+  image: string;
 }
 
 export default function LandingPage() {
@@ -122,55 +121,35 @@ export default function LandingPage() {
     },
   ];
 
-  // Instalações na Galeria (Mock com representação visual via gradientes e ícones)
+  // Instalações na Galeria (Fotos reais de alta autoridade)
   const installations: Installation[] = [
     {
       id: 1,
       title: 'Sistema de Monitoramento CFTV IP',
       category: 'Segurança Eletrônica',
       description: 'Instalação de câmeras dome infravermelho de alta resolução com cabeamento estruturado e central organizadora organizada.',
-      gradient: 'from-emerald-950 via-slate-900 to-slate-950',
-      icon: (
-        <svg className="w-16 h-16 text-suseg-green/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-        </svg>
-      ),
+      image: '/gallery/cctv.png',
     },
     {
       id: 2,
       title: 'Carregador Wallbox Residencial',
       category: 'Carregamento Veicular',
       description: 'Estação de recarga inteligente 22kW montada em garagem residencial, com proteção elétrica completa (DR e disjuntor exclusivo).',
-      gradient: 'from-suseg-green-dark via-slate-900 to-slate-950',
-      icon: (
-        <svg className="w-16 h-16 text-suseg-green/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-      ),
+      image: '/gallery/charger.png',
     },
     {
       id: 3,
       title: 'Central Touch de Automação',
       category: 'Automação Residencial',
       description: 'Painel inteligente embutido para controle integrado de persianas, iluminação programada e ar condicionado.',
-      gradient: 'from-cyan-950 via-slate-900 to-slate-950',
-      icon: (
-        <svg className="w-16 h-16 text-suseg-green/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
-      ),
+      image: '/gallery/smart-home.png',
     },
     {
       id: 4,
       title: 'Leitor Facial e Biométrico',
       category: 'Segurança Eletrônica',
       description: 'Controle de acesso facial ultrarrápido instalado no portão de pedestres de condomínio de alto padrão.',
-      gradient: 'from-blue-950 via-slate-900 to-slate-950',
-      icon: (
-        <svg className="w-16 h-16 text-suseg-green/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
+      image: '/gallery/facial.png',
     },
   ];
 
@@ -412,24 +391,28 @@ export default function LandingPage() {
               <div
                 key={item.id}
                 onClick={() => setActiveImage(item)}
-                className="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-lg border border-slate-100 cursor-pointer transition-all duration-300"
+                className="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-lg border border-slate-100 cursor-pointer transition-all duration-300 bg-white"
               >
-                {/* Visual placeholder with styled gradient and icon */}
-                <div className={`aspect-square bg-gradient-to-br ${item.gradient} flex flex-col items-center justify-center p-6 text-center text-white relative`}>
-                  {item.icon}
-                  <span className="text-xs font-extrabold uppercase tracking-widest text-suseg-green bg-suseg-green-light px-2.5 py-0.5 rounded-full mt-4">
+                {/* Imagem realística da instalação */}
+                <div className="aspect-square relative overflow-hidden bg-slate-100 flex items-center justify-center">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <span className="absolute top-3 left-3 text-[9px] font-extrabold uppercase tracking-widest text-suseg-green bg-suseg-green-light px-2.5 py-0.5 rounded-full z-10 shadow-sm border border-suseg-green/10">
                     {item.category}
                   </span>
                   
                   {/* Hover overlay with zoom icon */}
-                  <div className="absolute inset-0 bg-chombo-dark/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4 flex-col">
+                  <div className="absolute inset-0 bg-chombo-dark/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4 flex-col z-20">
                     <svg className="w-8 h-8 text-white mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
                     </svg>
                     <span className="text-xs font-bold text-white uppercase tracking-wider">Ampliar Detalhes</span>
                   </div>
                 </div>
-                <div className="p-4 bg-white border-t border-slate-50">
+                <div className="p-4 bg-white border-t border-slate-100">
                   <h4 className="text-xs font-black text-chombo-dark truncate">{item.title}</h4>
                   <p className="text-[10px] text-slate-400 font-semibold mt-0.5">{item.category}</p>
                 </div>
@@ -640,11 +623,15 @@ export default function LandingPage() {
             className="bg-white rounded-3xl overflow-hidden max-w-2xl w-full shadow-2xl relative animate-scaleIn border border-slate-100"
           >
             {/* Visual element in lightbox */}
-            <div className={`w-full aspect-video bg-gradient-to-br ${activeImage.gradient} flex items-center justify-center text-white relative`}>
-              {activeImage.icon}
+            <div className="w-full aspect-video relative overflow-hidden bg-slate-100">
+              <img
+                src={activeImage.image}
+                alt={activeImage.title}
+                className="w-full h-full object-cover"
+              />
               <button
                 onClick={() => setActiveImage(null)}
-                className="absolute top-4 right-4 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 cursor-pointer transition-colors"
+                className="absolute top-4 right-4 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 cursor-pointer transition-colors z-10"
                 aria-label="Fechar"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
