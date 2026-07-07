@@ -9,14 +9,14 @@ export default function LeadForm({ defaultService = '' }: { defaultService?: str
     email: '',
     telefone: '',
     cidade: '',
-    tipo_servico: '',
+    tipo_servico: defaultService,
   });
 
-  React.useEffect(() => {
-    if (defaultService) {
-      setFormData((prev) => ({ ...prev, tipo_servico: defaultService }));
-    }
-  }, [defaultService]);
+  const [prevDefaultService, setPrevDefaultService] = useState(defaultService);
+  if (defaultService !== prevDefaultService) {
+    setPrevDefaultService(defaultService);
+    setFormData((prev) => ({ ...prev, tipo_servico: defaultService }));
+  }
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -46,9 +46,10 @@ export default function LeadForm({ defaultService = '' }: { defaultService?: str
 
       setSuccess(true);
       setFormData({ nome: '', email: '', telefone: '', cidade: '', tipo_servico: '' });
-    } catch (err: any) {
+    } catch (err) {
       console.error('Falha ao enviar lead:', err);
-      setError(err.message || 'Ocorreu um erro ao enviar seus dados. Tente novamente.');
+      const errorMsg = err instanceof Error ? err.message : 'Ocorreu um erro ao enviar seus dados. Tente novamente.';
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

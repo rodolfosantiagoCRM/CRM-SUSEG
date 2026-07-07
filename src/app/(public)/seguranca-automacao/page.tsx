@@ -10,6 +10,17 @@ import { getPublicWhatsappNumber } from '@/app/actions/whatsapp';
 export default function SegurancaAutomacaoPage() {
   const [whatsappNumber, setWhatsappNumber] = useState('5541999999999');
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const [selectedService, setSelectedService] = useState('Automação Residencial e Predial');
+
+  const handleSelectService = (title: string) => {
+    if (title.includes('Segurança') || title.includes('Controle')) {
+      setSelectedService('Segurança Eletrônica');
+    } else if (title.includes('Automação')) {
+      setSelectedService('Automação Residencial e Predial');
+    } else {
+      setSelectedService('');
+    }
+  };
 
   React.useEffect(() => {
     async function loadWhatsapp() {
@@ -220,9 +231,27 @@ export default function SegurancaAutomacaoPage() {
                     ))}
                   </ul>
                 </div>
-              </div>
-            ))}
-          </div>
+
+                <div className="flex flex-col gap-2 pt-4 border-t border-slate-100/60 mt-auto">
+                  <a
+                    href="#orcamento"
+                    onClick={() => handleSelectService(sol.title)}
+                    className="w-full text-center py-2.5 bg-suseg-green hover:bg-suseg-green-dark text-white rounded-xl font-extrabold text-xs transition-all shadow-md shadow-suseg-green/10 active:scale-[0.98] cursor-pointer"
+                  >
+                    Solicitar Orçamento
+                  </a>
+                  <a
+                    href={`https://wa.me/${whatsappNumber}?text=Olá!%20Gostaria%20de%20um%20orçamento%20para%20${encodeURIComponent(sol.title)}.`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full text-center py-2.5 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded-xl font-extrabold text-xs transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <svg className="w-3.5 h-3.5 text-emerald-500 fill-current" viewBox="0 0 24 24">
+                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.458L0 24zm6.59-4.846c1.62.963 3.41 1.47 5.238 1.472 5.516 0 10.007-4.49 10.01-10.01.002-2.673-1.04-5.184-2.937-7.084-1.896-1.899-4.41-2.942-7.08-2.943-5.52 0-10.01 4.49-10.014 10.01-.002 1.902.501 3.758 1.458 5.4l-.993 3.626 3.722-.976zm12.182-8.312c-.29-.145-1.72-.848-1.986-.944-.267-.097-.461-.145-.656.145-.194.29-.752.944-.922 1.138-.17.194-.34.218-.63.072-1.285-.644-2.126-1.127-2.973-2.58-.222-.38.222-.353.636-1.18.069-.145.034-.27-.017-.38-.05-.11-.461-1.11-.63-1.524-.166-.399-.334-.345-.461-.351-.12-.006-.258-.007-.396-.007s-.362.052-.552.258c-.19.206-.723.707-.723 1.724 0 1.017.74 2.001.843 2.14.103.14 1.457 2.224 3.53 3.12.493.213.878.34 1.179.436.497.158.95.135 1.307.082.399-.06 1.72-.703 1.962-1.383.243-.68.243-1.264.17-1.382-.073-.118-.267-.19-.557-.335z"/>
+                    </svg>
+                    Entrar em Contato
+                  </a>
+                </div>
         </div>
       </section>
 
@@ -342,7 +371,7 @@ export default function SegurancaAutomacaoPage() {
             <div className="bg-white border border-slate-100 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-suseg-green" />
               <h3 className="text-lg font-black text-chombo-dark mb-6">Solicitar Proposta Comercial</h3>
-              <LeadForm defaultService="Automação Residencial e Predial" />
+              <LeadForm defaultService={selectedService} />
             </div>
           </div>
         </div>
