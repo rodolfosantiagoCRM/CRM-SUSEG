@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import SusegLogo from '@/components/public/suseg-logo';
 import LeadForm from '@/components/public/lead-form';
-import EvCalculator from '@/components/public/ev-calculator';
 import WhatsAppButton from '@/components/public/whatsapp-button';
 import CasanLogo from '@/components/public/casan-logo';
 import { getPublicWhatsappNumber } from '@/app/actions/whatsapp';
@@ -246,12 +245,12 @@ export default function LandingPage() {
               >
                 Solicitar Orçamento Gratuito
               </a>
-              <a
-                href="#calculadora"
+              <Link
+                href="/carregamento-veicular#simulador"
                 className="w-full sm:w-auto px-8 py-4 bg-white hover:bg-slate-50 text-slate-650 border border-slate-200 font-bold text-sm rounded-xl transition-all shadow-sm text-center cursor-pointer active:scale-[0.98]"
               >
                 Simular Economia EV
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -354,18 +353,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Seção Calculadora de Economia EV (Desejo/Engajamento) */}
-      <section id="calculadora" className="py-20 bg-slate-50">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-            <span className="text-xs font-bold text-suseg-green uppercase tracking-widest block">Simulador Financeiro</span>
-            <h2 className="text-3xl md:text-4xl font-black text-chombo-dark">Calcule sua Economia com Carro Elétrico</h2>
-            <p className="text-slate-500 font-medium">Veja na ponta do lápis o retorno financeiro ao trocar o combustível fóssil pela recarga elétrica residencial.</p>
-          </div>
-          
-          <EvCalculator />
-        </div>
-      </section>
+
 
       {/* Seção Prova Social e Galeria (Confiança) */}
       <section id="galeria" className="py-20 md:py-28 bg-white">
@@ -596,7 +584,7 @@ export default function LandingPage() {
             <span>•</span>
             <a href="#servicos" className="hover:text-suseg-green">Projetos & Padrões</a>
             <span>•</span>
-            <a href="#calculadora" className="hover:text-suseg-green">Simulador EV</a>
+            <Link href="/carregamento-veicular#simulador" className="hover:text-suseg-green">Simulador EV</Link>
             <span>•</span>
             <Link href="/login" className="hover:text-suseg-green">Acessar CRM</Link>
           </div>
