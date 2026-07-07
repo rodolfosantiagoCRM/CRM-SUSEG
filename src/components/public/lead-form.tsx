@@ -10,6 +10,7 @@ export default function LeadForm({ defaultService = '' }: { defaultService?: str
     telefone: '',
     cidade: '',
     tipo_servico: defaultService,
+    observacoes: '',
   });
 
   const [prevDefaultService, setPrevDefaultService] = useState(defaultService);
@@ -22,7 +23,7 @@ export default function LeadForm({ defaultService = '' }: { defaultService?: str
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -42,10 +43,11 @@ export default function LeadForm({ defaultService = '' }: { defaultService?: str
         endereco_obra: null,
         numero: null,
         tipo_servico: formData.tipo_servico || null,
+        observacoes: formData.observacoes || null,
       });
 
       setSuccess(true);
-      setFormData({ nome: '', email: '', telefone: '', cidade: '', tipo_servico: '' });
+      setFormData({ nome: '', email: '', telefone: '', cidade: '', tipo_servico: '', observacoes: '' });
     } catch (err) {
       console.error('Falha ao enviar lead:', err);
       const errorMsg = err instanceof Error ? err.message : 'Ocorreu um erro ao enviar seus dados. Tente novamente.';
@@ -167,6 +169,21 @@ export default function LeadForm({ defaultService = '' }: { defaultService?: str
             </svg>
           </div>
         </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <label htmlFor="observacoes" className="text-[10px] font-bold uppercase tracking-widest text-slate-450">
+          Detalhes do Projeto / Necessidades (Opcional)
+        </label>
+        <textarea
+          id="observacoes"
+          name="observacoes"
+          value={formData.observacoes}
+          onChange={handleChange}
+          rows={3}
+          placeholder="Descreva aqui o seu projeto, prazos ou necessidades especiais..."
+          className="w-full bg-white border border-slate-200 focus:border-suseg-green focus:ring-2 focus:ring-suseg-green/10 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-455 outline-none transition-all text-sm font-semibold resize-none"
+        />
       </div>
 
       {error && (
