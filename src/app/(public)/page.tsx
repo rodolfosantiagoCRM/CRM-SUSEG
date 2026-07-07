@@ -610,7 +610,7 @@ export default function LandingPage() {
       <footer className="border-t border-slate-100 bg-white py-16 text-center text-xs text-slate-400">
         <div className="max-w-6xl mx-auto px-6 space-y-6">
           <div className="flex justify-center">
-            <SusegLogo showText={true} />
+            <SusegLogo className="h-16" />
           </div>
           <div className="flex justify-center flex-wrap gap-y-2 gap-x-6 text-slate-400 font-bold">
             <Link href="/" className="hover:text-suseg-green">Página Inicial</Link>

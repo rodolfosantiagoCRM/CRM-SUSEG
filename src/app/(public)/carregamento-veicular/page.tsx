@@ -392,7 +392,7 @@ export default function CarregamentoVeicularPage() {
         <div className="max-w-6xl mx-auto px-6 space-y-6">
           <div className="flex justify-center">
             <Link href="/">
-              <SusegLogo showText={true} />
+              <SusegLogo className="h-16" />
             </Link>
           </div>
           <div className="flex justify-center flex-wrap gap-y-2 gap-x-6 text-slate-400 font-bold">
